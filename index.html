@@ -1318,6 +1318,8 @@
         // Add is-last-step class to main when on last step
         mainLayout.classList.toggle('is-last-step', currentStep === stepSections.length);
       }
+      // Scroll to top when changing steps
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       // refresh preview whenever the step changes
       setCopyAvailability(false);
       if (shouldShowPreview){
