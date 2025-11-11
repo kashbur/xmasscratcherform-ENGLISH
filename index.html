@@ -1,0 +1,2312 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Customize Your Reveal Link</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Google Fonts stylesheet removed -->
+  <style>
+    /* --- Password gate (brand-matched) --- */
+    .gate-overlay{
+      position: static; /* make it a normal block, not an overlay */
+      inset: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--jj-bg);
+      padding: clamp(1rem,4vw,2rem);
+      min-height: 100vh; /* ensure full screen height */
+      z-index: 999999; /* ensure on top of any accidental overlays */
+    }
+
+    .gate-card{ position: relative; z-index: 100001;
+      width:min(520px,100%);
+      background:#fffdf9;
+      border:1px solid var(--jj-border);
+      border-radius:20px;
+      box-shadow:0 24px 48px rgba(93,85,73,.18);
+      padding:clamp(1.5rem,4.5vw,2.25rem);
+      text-align:center;
+    }
+    .gate-title{ margin:0 0 .5rem; font-size:clamp(1.4rem,4vw,1.9rem); font-weight:800; color:var(--jj-text); }
+    .gate-sub{ margin:.25rem 0 1rem; color:rgba(31,35,69,.72); font-size:.95rem; }
+    .gate-sub a{ color:var(--jj-accent); font-weight:700; text-decoration:none; }
+    .gate-sub a:hover{ text-decoration:underline; }
+    .gate-input{ width:100%; padding:.85rem 1rem; border:1px solid var(--jj-border); border-radius:12px; font:inherit; color:var(--jj-text); background:#fff; box-shadow:inset 0 1px 0 rgba(255,255,255,.6); }
+    .gate-input:focus{ outline:none; border-color:rgba(216,141,106,.7); box-shadow:0 0 0 4px rgba(216,141,106,.18); }
+    .gate-button{ margin-top:.9rem; width:100%; border:none; border-radius:999px; padding:.85rem 1.25rem; font-weight:800; background:linear-gradient(180deg, var(--jj-accent), var(--jj-accent-2)); color:#fff; cursor:pointer; box-shadow:0 10px 24px rgba(216,141,106,.35); transition:transform 140ms, box-shadow 140ms, filter 140ms; }
+    .gate-button:hover{ transform:translateY(-1px); box-shadow:0 16px 32px rgba(216,141,106,.38); filter:saturate(1.05); }
+    .gate-error{ min-height:1.2em; margin-top:.5rem; font-size:.9rem; color:#d64545; }
+    /* When unlocked, hide overlay */
+    .gate-overlay[hidden]{ display:none !important; }
+    @font-face{
+      font-family:"Christmas Wonderland";
+      src:url("./fonts/Christmas-Wonderland.woff2") format("woff2"),
+          url("./fonts/Christmas-Wonderland.woff") format("woff");
+      font-weight:400; font-style:normal; font-display:swap;
+    }
+    @font-face{
+      font-family:"Christmas";
+      src:url("./fonts/Christmas.woff2") format("woff2"),
+          url("./fonts/Christmas.woff") format("woff");
+      font-weight:400; font-style:normal; font-display:swap;
+    }
+    @font-face{
+      font-family:"Merry Baby";
+      src:url("./fonts/Merry-Baby.woff2") format("woff2"),
+          url("./fonts/Merry-Baby.woff") format("woff");
+      font-weight:400; font-style:normal; font-display:swap;
+    }
+    @font-face{
+      font-family:"Vintage Christmas";
+      src:url("./fonts/Vintage-Chrismas.woff2") format("woff2"),
+          url("./fonts/Vintage-Chrismas.woff") format("woff");
+      font-weight:400; font-style:normal; font-display:swap;
+    }
+    :root{
+      color-scheme: light;
+      font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont,'Segoe UI', sans-serif;
+      /* Joy Jot Studio brand tokens (from logo) */
+      --jj-bg:#FAF5EE;          /* creamy background */
+      --jj-text:#5D5549;        /* warm neutral text */
+      --jj-accent:#D88D6A;      /* peach primary */
+      --jj-accent-2:#C77655;    /* deeper peach for gradient */
+      --jj-gold:#F2C67D;        /* soft gold accent */
+      --jj-surface:#FFFFFF;     /* card/surface */
+      --jj-border:#E8DED3;      /* soft border */
+      --jj-shadow:0 12px 28px rgba(93,85,73,.12); /* gentle shadow */
+      --accent: var(--jj-accent);
+    }
+    *,*::before,*::after{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      background:
+        radial-gradient(600px 400px at 20% 15%, rgba(242,198,125,.22), transparent 60%),
+        radial-gradient(700px 520px at 80% 85%, rgba(216,141,106,.18), transparent 58%),
+        var(--jj-bg);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:clamp(1.5rem,4vw,3.5rem);
+      color:var(--jj-text);
+    }
+    main{
+      position:relative;
+      width:min(1080px,100%);
+      display:grid; gap:clamp(1.75rem,4vw,3rem);
+      grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+      background:#FFFDF9;
+      padding:clamp(1.85rem,5vw,3.6rem);
+      border-radius:24px;
+      border:1px solid var(--jj-border);
+      box-shadow:var(--jj-shadow);
+    }
+    h1{ grid-column:1 / -1; margin:0; font-size:clamp(1.95rem,4.5vw,2.9rem); font-weight:700; color:var(--jj-text); text-align:center; letter-spacing:.2px; }
+    form{ display:flex; flex-direction:column; gap:1.25rem; position:relative; }
+    label{ display:block; font-weight:600; font-size:1rem; color:var(--jj-text); margin-bottom:.5rem; }
+    fieldset{ border:none; padding:0; margin:0; }
+    .radio-group{
+      display: flex;
+      justify-content: center;
+      gap: 1rem; /* bring buttons closer together */
+    }
+    .radio-option{
+      display:flex; align-items:center; gap:.65rem;
+      padding:.85rem 1.05rem; border-radius:14px;
+      border:1px solid var(--jj-border); background:#fff; cursor:pointer;
+      transition:border-color 140ms, background 140ms, box-shadow 140ms, transform 140ms;
+    }
+    .radio-option:hover{ transform:translateY(-1px); box-shadow:0 6px 14px rgba(93,85,73,.12); }
+    .radio-option input[type='radio']{
+      width:18px; height:18px; accent-color:var(--accent);
+      outline:none; box-shadow:none; /* remove native focus box */
+    }
+    .radio-option input[type='radio']:focus{ outline:none; box-shadow:none; }
+    .radio-option input[type='radio']:focus-visible{ outline:none; box-shadow:none; }
+    .radio-option.active{
+      border-color:rgba(216,141,106,.55);
+      background:rgba(216,141,106,.06);
+      box-shadow:0 10px 24px rgba(216,141,106,.18);
+    }
+    input[type='text'], select, textarea{
+      width:100%; border-radius:14px; border:1px solid var(--jj-border);
+      padding:.9rem 1rem; font:inherit; color:var(--jj-text);
+      background:#fff; box-shadow:inset 0 1px 0 rgba(255,255,255,.6);
+    }
+    textarea{ min-height:120px; resize:vertical; border-radius:16px; }
+    textarea:focus, input:focus, select:focus{
+      border-color:rgba(216,141,106,.7);
+      box-shadow:0 0 0 4px rgba(216,141,106,.18), inset 0 1px 0 rgba(255,255,255,.6);
+      outline:none;
+    }
+    .actions{ display:flex; gap:1rem; flex-wrap:wrap; }
+    button.primary{
+      border:none; border-radius:999px;
+      padding:.9rem 1.85rem; font-size:1rem; font-weight:800; letter-spacing:.2px;
+      background:linear-gradient(180deg, var(--jj-accent), var(--jj-accent-2));
+      color:white; cursor:pointer;
+      box-shadow:0 8px 24px rgba(216,141,106,.35);
+      transition:transform 140ms, box-shadow 140ms, filter 140ms;
+    }
+    button.primary:hover, button.primary:focus-visible{
+      transform:translateY(-2px); box-shadow:0 16px 32px rgba(216,141,106,.38); outline:none; filter:saturate(1.05);
+    }
+    button.primary:active{ transform:translateY(-1px) scale(.997); }
+    .output{ display:flex; flex-direction:column; gap:.75rem; }
+    .preview-panel{
+      display:flex; flex-direction:column; gap:1rem;
+      padding:1.25rem; border-radius:20px;
+      border:1px solid var(--jj-border);
+      background:#FFFDF9;
+      box-shadow:0 18px 36px rgba(93,85,73,.10);
+    }
+    .preview-panel[hidden]{ display:none !important; }
+    .preview-header{ display:flex; flex-direction:column; gap:.35rem; }
+    .preview-title{ margin:0; font-size:1.15rem; font-weight:600; color:var(--jj-text); }
+    .preview-note{ margin:0; font-size:.9rem; color:rgba(93,85,73,.75); }
+    .preview-frame-wrapper{
+      position:relative; flex:0 0 auto;
+      width:min(100%,420px); aspect-ratio:9 / 16;
+      border-radius:16px; overflow:hidden;
+      background:white;
+      border:1px solid var(--jj-border);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.6);
+      margin-inline:auto;
+      transition:border-color 140ms, box-shadow 140ms, transform 140ms;
+    }
+    .preview-frame-wrapper:hover,
+    .preview-frame-wrapper:focus-within{
+      border-color:rgba(216,141,106,.7);
+      box-shadow:0 0 0 4px rgba(216,141,106,.14), inset 0 1px 0 rgba(255,255,255,.6);
+      transform:translateY(-1px);
+    }
+    .preview-frame{ width:100%; height:100%; border:0; border-radius:inherit; background:white; }
+    .output input[type='text']{
+      border-radius:12px;
+      border:1px solid var(--jj-border);
+      padding:.85rem 1.15rem;
+      font-size:.95rem;
+      transition:border-color 140ms, box-shadow 140ms;
+    }
+    .output input[type='text']:hover,
+    .output input[type='text']:focus{
+      border-color:rgba(216,141,106,.7);
+      box-shadow:0 0 0 4px rgba(216,141,106,.14), inset 0 1px 0 rgba(255,255,255,.6);
+      outline:none;
+    }
+    .output-controls{ display:flex; flex-wrap:wrap; gap:.75rem; }
+    button.secondary{
+      border:none; border-radius:999px;
+      padding:.75rem 1.6rem; font-size:.95rem; font-weight:600;
+      background:rgba(93,85,73,.08); color:var(--jj-text); cursor:pointer;
+      transition:background 140ms, transform 140ms, box-shadow 140ms;
+    }
+    button.secondary:hover, button.secondary:focus-visible{
+      background:rgba(93,85,73,.16); transform:translateY(-1px); outline:none; box-shadow:0 6px 14px rgba(93,85,73,.12);
+    }
+    button.secondary[disabled]{ opacity:.55; cursor:not-allowed; transform:none; }
+
+    main {
+      position: relative;
+    }
+    /* Floating action buttons group (top-right) */
+    .fab-group {
+      position: fixed;              /* keep anchored to the viewport */
+      top: clamp(12px, 2vw, 20px);
+      right: clamp(12px, 2vw, 20px);
+      z-index: 10000;
+      display: inline-flex;
+      gap: 8px;
+      pointer-events: none;         /* prevent group from blocking inputs */
+    }
+    .fab-group > * {
+      pointer-events: auto; /* re-enable interactivity for child buttons */
+    }
+
+    /* Utility: hide FAB group when scrolling or typing on mobile */
+    .fab-group.is-hidden{
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(6px);
+      transition: opacity 140ms ease, transform 140ms ease;
+    }
+
+    /* Hide #app when hidden attribute is present */
+    #app[hidden]{ display: none !important; }
+
+
+    /* When the password gate overlay is visible, hide the floating buttons completely */
+    body.gate-active .fab-group {
+      display: none !important;
+    }
+
+    /* While the password gate is active, hide all other app UI explicitly */
+    body.gate-active #app { display: none !important; }
+    body.gate-active main,
+    body.gate-active .language-overlay,
+    body.gate-active .steps,
+    body.gate-active #previewContainer { display: none !important; }
+    /* Keep the gate visible */
+    body.gate-active #gate { display: flex !important; }
+
+    /* Shared FAB styles for language globe and ? help link */
+    .language-fab,
+    .help-fab {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      border: 1px solid var(--jj-border);
+      background: rgba(93, 85, 73, .06);
+      color: var(--jj-text);
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(93, 85, 73, .10);
+      transition: transform 140ms, box-shadow 140ms, background 140ms;
+      text-decoration: none; /* ensure the anchor looks like a button */
+      font-weight: 800;      /* bold ? */
+      line-height: 1;
+    }
+
+    .language-fab:hover,
+    .help-fab:hover,
+    .language-fab:focus-visible,
+    .help-fab:focus-visible {
+      background: rgba(93, 85, 73, .14);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(93, 85, 73, .16);
+      outline: none;
+    }
+
+    .language-fab:active,
+    .help-fab:active {
+      transform: translateY(0);
+    }
+
+    .language-fab .icon { display: block; }
+
+    /* --- Help teaser (shows once) --- */
+    .help-teaser{
+      position: absolute;
+      top: 52px; /* below the buttons */
+      right: 0;
+      background: #fff;
+      border: 1px solid var(--jj-border);
+      border-radius: 12px;
+      padding: .55rem .7rem;
+      box-shadow: 0 10px 24px rgba(93,85,73,.14);
+      color: var(--jj-text);
+      font-weight: 700;
+      font-size: .95rem;
+      z-index: 11;
+      animation: teaser-fade 4s ease forwards;
+    }
+    .help-popover,
+    .help-teaser {
+      pointer-events: auto;
+    }
+    @keyframes teaser-fade{
+      0%{ opacity:0; transform: translateY(-4px); }
+      10%{ opacity:1; transform: translateY(0); }
+      80%{ opacity:1; }
+      100%{ opacity:0; transform: translateY(-4px); }
+    }
+
+    /* --- Help popover --- */
+    .help-popover{
+      position: absolute;
+      top: 52px; /* below the buttons */
+      right: 0;
+      width: 260px;
+      background: #fff;
+      border: 1px solid var(--jj-border);
+      border-radius: 14px;
+      box-shadow: 0 18px 36px rgba(93,85,73,.18);
+      padding: .9rem;
+      z-index: 12;
+    }
+    .help-popover__arrow{
+      position: absolute;
+      top: -8px; right: 14px;
+      width: 16px; height: 16px;
+      background: #fff;
+      border-left: 1px solid var(--jj-border);
+      border-top: 1px solid var(--jj-border);
+      transform: rotate(45deg);
+    }
+    .help-popover__title{
+      margin: 0 0 .25rem;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--jj-text);
+      text-align: left;
+    }
+    .help-popover__text{
+      margin: 0 0 .6rem;
+      font-size: .95rem;
+      color: rgba(31,35,69,.78);
+    }
+    .help-popover__cta{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .4rem;
+      border-radius: 999px;
+      border: 1px solid var(--jj-border);
+      padding: .55rem .9rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: #fff;
+      background: linear-gradient(180deg, var(--jj-accent), var(--jj-accent-2));
+      box-shadow: 0 8px 22px rgba(216,141,106,.32);
+      transition: transform 140ms, box-shadow 140ms, filter 140ms;
+    }
+    .help-popover__cta:hover,
+    .help-popover__cta:focus-visible{
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(216,141,106,.38);
+      outline: none;
+      filter: saturate(1.05);
+    }
+
+    /* Ensure .fab-group is the positioning context */
+
+    @media (max-width: 640px){
+      /* Make room so the floating ?/globe don't overlap the title on phones */
+      main{ 
+        /* add extra top padding on small screens (accounts for safe-area notch too) */
+        padding-top: calc(3.25rem + max(56px, env(safe-area-inset-top, 0px)));
+      }
+
+      /* FAB group: bottom-right, above safe area, smaller, with gap */
+      .fab-group{
+        position: fixed !important;
+        top: auto !important;
+        right: 10px !important;
+        bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+        left: auto !important;
+        gap: 6px;
+      }
+      .language-fab, .help-fab{ width: 36px; height: 36px; }
+
+      /* Help popover & teaser: appear above FABs, bottom-right */
+      .help-popover, .help-teaser{
+        top: auto;
+        bottom: 44px;  /* sit just above the FABs */
+        right: 0;
+      }
+
+      /* Popover arrow: flip to point down when above FABs */
+      .help-popover__arrow{
+        top: auto;
+        bottom: -8px;
+        right: 14px;
+        transform: rotate(225deg); /* flip arrow to point downward */
+      }
+    }
+    .field-feedback{ margin-top:.4rem; font-size:.85rem; color:rgba(31,35,69,.75); min-height:1.2em; }
+    .field-feedback[hidden]{ display:none; }
+    .field-feedback.is-error{ color:#d64545; }
+    .field-feedback.is-success{ color:#1f8f4d; }
+    .image-help-row{ display:flex; align-items:center; gap:.5rem; margin-bottom:.35rem; }
+    .image-help-title{ font-weight:600; color:var(--jj-text); font-size:.95rem; }
+    .help-trigger{ border:none; width:32px; height:32px; border-radius:50%; background:rgba(216,141,106,.12); color:var(--jj-accent); font-weight:700; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:background 140ms, transform 140ms; }
+    .help-trigger:hover, .help-trigger:focus-visible{ background:rgba(216,141,106,.2); transform:translateY(-1px); outline:none; }
+    .image-tooltip{ margin-bottom:.85rem; padding:1rem 1.15rem; border-radius:14px; border:1px solid rgba(216,141,106,.35); background:rgba(216,141,106,.08); color:var(--jj-text); font-size:.9rem; line-height:1.5; box-shadow:0 10px 28px rgba(93,85,73,.12); 
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .image-tooltip a{ color: var(--jj-accent); font-weight:600; }
+    .language-overlay{ position:fixed; inset:0; background:rgba(15,18,45,.50); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:clamp(1.5rem,5vw,3rem); z-index:999; }
+    .language-overlay[hidden]{ display:none; }
+    .language-dialog{ width:min(520px,100%); background:#FFFDF9; border:1px solid var(--jj-border); border-radius:24px; padding:clamp(1.75rem,4vw,2.75rem); display:flex; flex-direction:column; gap:1.5rem; box-shadow:0 28px 56px rgba(93,85,73,.18); }
+    .language-dialog h2{ margin:0; font-size:clamp(1.45rem,4vw,1.85rem); font-weight:600; color:var(--jj-text); text-align:center; }
+    .language-dialog p{ margin:0; color:rgba(93,85,73,.78); text-align:center; font-size:.95rem; }
+    .language-options{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:.75rem; }
+    .language-overlay .radio-option{ justify-content:center; }
+    .visually-hidden{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    .field-hint{ margin:.35rem 0 0; font-size:.85rem; color:rgba(31,35,69,.65); }
+    .field-hint {
+      line-height: 1.6;
+    }
+    .field-hint .hint-default {
+      display: block;
+      padding: .65rem .75rem;
+      margin: .5rem 0 .6rem;
+      background: rgba(93,85,73,.06);
+      border: 1px solid var(--jj-border);
+      border-radius: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: .95rem;
+      color: rgba(31,35,69,.85);
+      word-break: break-word;
+    }
+    .field-hint .hint-note {
+      display: block;
+      margin-top: .35rem;
+      color: rgba(31,35,69,.72);
+    }
+    /* Center layout only for Step 1 */
+    main.is-step-one{
+      grid-template-columns:1fr;
+      justify-items:center;
+    }
+    main.is-step-one #revealForm{
+      width:min(100%,520px);
+    }
+    .form-step[data-step="1"]{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+    .form-step[data-step="1"] legend{
+      width:100%;
+      text-align:center;
+      margin-bottom:1.25rem;
+    }
+    .form-step[data-step="1"] .radio-group{
+      margin-inline:auto;
+      justify-items:center; /* center items inside the grid cells */
+    }
+    .form-step[data-step="1"] .step-nav{
+      justify-content:center; /* center the Next button row */
+    }
+    .form-step[data-step="1"] .step-nav .spacer{
+      display:none; /* remove the left spacer so the button can center */
+    }
+    /* Wizard steps */
+    /* Font picker preview grid */
+    .font-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:.5rem; margin-top:.5rem; }
+    .font-chip{ display:flex; align-items:center; justify-content:center; padding:.6rem .9rem; border-radius:12px; border:1px solid var(--jj-border); background:#fff; cursor:pointer; transition:transform 120ms, box-shadow 120ms, border-color 120ms; min-height:44px; text-align:center; position:relative; }
+    .font-chip:hover, .font-chip:focus-visible{
+      transform:translateY(-1px); box-shadow:0 8px 18px rgba(93,85,73,.12); outline:none;
+    }
+    .font-chip:focus-within{
+      border-color:rgba(216,141,106,.7);
+      box-shadow:0 0 0 4px rgba(216,141,106,.14), 0 6px 14px rgba(93,85,73,.12);
+    }
+    .font-chip[aria-pressed="true"]{ border-color:rgba(216,141,106,.65); background:rgba(216,141,106,.06); box-shadow:0 10px 24px rgba(216,141,106,.18); }
+    .font-chip .font-name{ font-weight:400; font-size:1.14rem; font-synthesis-weight:none; color:var(--jj-text); }
+    .font-chip[data-value="christmas-wonderland"] .font-name {
+      font-size: 1.36rem; /* 20% larger than base 1.14rem */
+    }
+    .font-chip .check{
+      display: none;
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-size: .95rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--jj-accent);
+    }
+    .font-chip[aria-pressed="true"] .check{
+      display: inline-block;
+    }
+    .section-divider{
+      height: 1px;
+      border: 0;
+      background: var(--jj-border);
+      margin: 1rem 0 .5rem;
+    }
+    .field-subheading{
+      font-weight: 700;
+      font-size: .95rem;
+      color: var(--jj-text);
+      margin: .35rem 0 .45rem;
+    }
+    .input-strong{
+      border-color: rgba(216,141,106,.35);
+      box-shadow: 0 0 0 2px rgba(216,141,106,.08), inset 0 1px 0 rgba(255,255,255,.6);
+    }
+    .input-wide {
+      width: 100%;
+      max-width: 580px;
+      padding: 0.7rem 0.9rem;
+      font-size: 1rem;
+      border: 1.5px solid rgba(31,35,69,.25);
+      border-radius: 8px;
+    }
+    .font-section{
+      margin-top: 1.1rem;
+    }
+    /* Hide native select but keep it accessible to screen readers */
+    #styleSelect{ position:absolute; opacity:0; pointer-events:none; width:1px; height:1px; }
+    .steps{ grid-column:1 / -1; }
+    .steps-list{ list-style:none; padding:0; margin:0 0 .5rem 0; display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; }
+    .step-pill{ padding:.45rem .8rem; border-radius:999px; border:1px solid var(--jj-border); font-size:.85rem; color:var(--jj-text); background:#fff; opacity:.7; transition:opacity 140ms, transform 140ms, box-shadow 140ms, border-color 140ms; cursor:pointer; }
+    .step-pill.is-active{ opacity:1; border-color:rgba(216,141,106,.55); box-shadow:0 6px 16px rgba(216,141,106,.14); transform:translateY(-1px); }
+    .step-pill:focus-visible{
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(216,141,106,.35), 0 6px 16px rgba(216,141,106,.14);
+    }
+    .form-step[hidden]{ display:none !important; }
+    .step-nav {
+      display: flex;
+      gap: 1.6rem;
+      justify-content: space-between;
+      margin-top: 2.2rem;
+    }
+    .step-nav .spacer{ flex:1; }
+    .form-step button,
+    .form-step .step-nav button {
+      margin: 0.8rem 0.6rem;
+    }
+    /* Add breathing room below form sections */
+    .form-step {
+      padding-bottom: 2.5rem;
+    }
+    textarea, select, input[type="text"] {
+      margin-bottom: 1.5rem;
+    }
+    .result-row{
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .copy-pill{
+      flex: 0 0 auto;
+      border: none;
+      border-radius: 999px;
+      padding: .55rem .95rem;
+      font-size: .9rem;
+      font-weight: 700;
+      background: linear-gradient(180deg, var(--jj-accent), var(--jj-accent-2));
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(216,141,106,.35);
+      transition: transform 140ms, box-shadow 140ms, filter 140ms;
+      outline: none;
+    }
+    .copy-pill:hover,
+    .copy-pill:focus-visible{
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(216,141,106,.38);
+      filter: saturate(1.05);
+    }
+    .copy-pill:active{
+      transform: translateY(0) scale(.98);
+    }
+
+    /* Confetti */
+    .confetti-container{
+      position: absolute;
+      inset: 0;
+      overflow: visible;
+      pointer-events: none;
+    }
+    .confetti-piece{
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 8px;
+      height: 10px;
+      background: var(--jj-accent);
+      opacity: 0;
+      transform: translate(-50%, -10px) rotate(0deg);
+      animation: confetti-fall 900ms ease-out forwards;
+    }
+    .confetti-piece.alt1{ background: var(--jj-accent-2); }
+    .confetti-piece.alt2{ background: var(--jj-gold); }
+    .confetti-piece.alt3{ background: #fff; border: 1px solid rgba(93,85,73,.15); }
+
+    @keyframes confetti-fall{
+      0%{ opacity:0; transform: translate(var(--x,0), -8px) rotate(0deg); }
+      10%{ opacity:1; }
+      100%{ opacity:0; transform: translate(var(--x,0), var(--y, -40px)) rotate(var(--r, 0deg)); }
+    }
+    .example-image{
+      display:block;
+      max-width:60%;
+      height:auto;
+      margin:.6rem auto .6rem;
+      border:1px solid var(--jj-border);
+      border-radius:12px;
+      box-shadow:0 10px 24px rgba(93,85,73,.10);
+      background:#fff;
+    }
+    .image-caption{
+      margin: .2rem auto .6rem;
+      text-align: center;
+      font-size: .9rem;
+      color: rgba(31,35,69,.70);
+      max-width: 560px;
+    }
+    /* Step 6 heading & layout */
+    [data-step="6"] .section-title{
+      font-size: 1.25rem;
+      font-weight: 800;
+      text-align: center;
+      margin: .2rem 0 .6rem;
+      color: var(--jj-text);
+    }
+    [data-step="6"] .example-image{
+      max-width: 60%;
+      margin: .4rem auto .9rem;
+    }
+    .image-url-row{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+      margin: .1rem 0 .35rem;
+    }
+    .image-url-row label{
+      font-weight: 600;
+      color: var(--jj-text);
+    }
+    @media (max-width:560px){
+      .example-image{ max-width:100%; }
+      .image-url-row{ flex-direction:column; align-items:flex-start; gap:.35rem; }
+      .image-tooltip{ font-size:.95rem; padding:.9rem 1rem; }
+    }
+    @media (max-width:760px){ main{ grid-template-columns:1fr; } .actions{ flex-direction:column; align-items:stretch; } .actions button{ width:100%; text-align:center; } .preview-frame-wrapper{ width:100%; max-width:360px; } }
+     /* Create Again button: hidden by default, shown only on last step */
+    #createAgainBtn { display: none; }
+    .is-last-step #createAgainBtn { display: inline-flex; }
+
+    .step-nav--final {
+      justify-content: flex-start;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    /* FAB group mobile positioning: pin to top-right on mobile */
+    @media (max-width: 640px){
+      .fab-group{
+        position: fixed;
+        top: calc(env(safe-area-inset-top, 0) + 10px);
+        right: calc(env(safe-area-inset-right, 0) + 10px);
+        left: auto;
+        bottom: auto;
+        z-index: 1000; /* ensure above form */
+        transition: opacity .18s ease, transform .18s ease;
+      }
+      /* Hide state used by existing JS (auto-hide while typing / scrolling) */
+      .fab-group.is-hidden{
+        opacity: 0;
+        transform: translateY(-8px);
+        pointer-events: none;
+      }
+      /* Popover opens BELOW the ? button on mobile when pinned to top */
+      .help-popover{
+        top: 42px;   /* below the buttons */
+        bottom: auto;
+        right: 0;
+        left: auto;
+      }
+      .help-popover .help-popover__arrow{
+        top: -8px;         /* arrow at top edge of popover */
+        bottom: auto;
+        transform: rotate(180deg); /* point upwards toward the buttons */
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div id="gate" class="gate-overlay" role="dialog" aria-modal="true" aria-labelledby="gateTitle" aria-describedby="gateHelp">
+    <div class="gate-card">
+      <h2 id="gateTitle" class="gate-title">Enter Access Password</h2>
+      <p id="gateHelp" class="gate-sub">You'll find the password in the order confirmation PDF attached to your Etsy receipt. Can't find it? <a href="https://www.etsy.com/shop/JoyJotStudio" target="_blank" rel="noopener noreferrer">Message me on Etsy</a>.</p>
+      <form id="gateForm">
+        <input id="gatePw" class="gate-input" type="password" inputmode="text" autocomplete="current-password" placeholder="Password" required autocapitalize="off" autocorrect="off" spellcheck="false" />
+        <button type="submit" class="gate-button">Continue</button>
+        <div id="gateError" class="gate-error" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+  <div id="app" hidden>
+  <main>
+    <h1 id="formTitle">Customize Your Reveal Link</h1>
+
+    <nav class="steps" aria-label="Progress">
+      <ol class="steps-list">
+        <li class="step-pill" data-step-pill="1">1. Gender</li>
+        <li class="step-pill" data-step-pill="2">2. Language</li>
+        <li class="step-pill" data-step-pill="3">3. Intro</li>
+        <li class="step-pill" data-step-pill="4">4. Title</li>
+        <li class="step-pill" data-step-pill="5">5. Reveal</li>
+        <li class="step-pill" data-step-pill="6">6. Image</li>
+        <li class="step-pill" data-step-pill="7">7. Link</li>
+      </ol>
+    </nav>
+
+    <!-- Top-right action buttons: Help and Language -->
+    <div class="fab-group">
+      <button
+        type="button"
+        class="help-fab"
+        id="helpFab"
+        title="Need help?"
+        aria-label="Need help?"
+        aria-controls="helpPopover"
+        aria-expanded="false"
+      >?</button>
+
+      <div id="helpTeaser" class="help-teaser" role="status" aria-live="polite" hidden>Need help?</div>
+
+      <div id="helpPopover" class="help-popover" role="dialog" aria-modal="false" aria-labelledby="helpPopoverTitle" hidden>
+        <div class="help-popover__arrow" aria-hidden="true"></div>
+        <h3 id="helpPopoverTitle" class="help-popover__title">Need help?</h3>
+        <p class="help-popover__text">Message me on Etsy and I’ll help you get set up.</p>
+        <a class="help-popover__cta" href="https://www.etsy.com/shop/JoyJotStudio" target="_blank" rel="noopener noreferrer">Message me on Etsy</a>
+      </div>
+
+      <button type="button" class="language-fab" id="changeLanguageButton" aria-haspopup="dialog" aria-label="Change form language">
+        <!-- Globe icon (inline SVG) -->
+        <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.75"/>
+          <path d="M3 12h18M12 3c3.5 3.6 3.5 13.4 0 18M12 3c-3.5 3.6-3.5 13.4 0 18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <span class="visually-hidden">Change form language</span>
+      </button>
+    </div>
+    <form id="revealForm">
+
+      <!-- STEP 1: Gender -->
+      <section class="form-step" data-step="1">
+        <fieldset>
+          <legend id="genderLabel">Boy or Girl?</legend>
+          <div class="radio-group" role="radiogroup" aria-labelledby="genderLabel">
+            <label class="radio-option gender-option active">
+              <input type="radio" name="gender" value="1" checked />
+              <span data-gender-option="boy">Boy</span>
+            </label>
+            <label class="radio-option gender-option">
+              <input type="radio" name="gender" value="0" />
+              <span data-gender-option="girl">Girl</span>
+            </label>
+          </div>
+        </fieldset>
+        <div class="step-nav">
+          <span class="spacer"></span>
+          <button type="button" class="primary" data-next>Next</button>
+        </div>
+      </section>
+
+      <!-- STEP 2: Reveal language -->
+      <section class="form-step" data-step="2" hidden>
+        <div id="ui-controls" role="group" aria-label="Reveal language controls">
+          <p class="ui-instruction" id="revealLanguageHint" style="font-size:1.3rem;font-weight:800;text-align:center;margin-bottom:8px;">Choose the language for the reveal design and message everyone will see.</p>
+          <div class="ui-row" style="flex-direction:column;align-items:center;gap:6px;">
+            <label for="revealLanguageSelect" id="revealLanguageLabel" style="font-size:1rem;">Reveal language</label>
+            <select id="revealLanguageSelect" name="lang">
+              <option value="en">English</option>
+              <option value="es">Español</option>
+              <option value="fr">Français</option>
+              <option value="de">Deutsch</option>
+              <option value="it">Italiano</option>
+              <option value="pt">Português</option>
+            </select>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button type="button" class="secondary" data-back>Back</button>
+          <button type="button" class="primary" data-next>Next</button>
+        </div>
+      </section>
+
+      <!-- STEP 3: Intro (landing overlay) -->
+      <section class="form-step" data-step="3" hidden>
+        <div>
+          <label for="introField" id="introLabel">Intro Message</label>
+          <div class="example-preview">
+            <img src="./landingpreview.png" alt="Intro example preview" class="example-image" loading="lazy">
+          </div>
+          <p class="field-hint" id="introHint">
+            Default:
+            <span class="hint-default">It’s Christmas time.|Oh what joy.|Is Baby a girl or boy?</span>
+            <span class="hint-note">Leave blank to use the default intro. Use the <code>|</code> character to make a new line.</span>
+          </p>
+          <div class="field-subheading" id="customIntroLabel">Custom Intro (optional)</div>
+          <textarea id="introField" class="input-strong" aria-labelledby="introLabel customIntroLabel" aria-describedby="introHint"></textarea>
+        </div>
+        <hr class="section-divider" aria-hidden="true">
+        <div class="font-section">
+          <h3 class="field-subheading" id="fontHeading">Choose a Font Style</h3>
+          <label for="styleSelect" id="styleLabel">Font</label>
+          <select id="styleSelect" aria-labelledby="fontHeading styleLabel">
+            <option value="christmas-wonderland" selected>Christmas Wonderland (default)</option>
+            <option value="merry">Merry Baby</option>
+            <option value="vintage">Vintage Christmas</option>
+            <option value="christmas">Christmas (plain)</option>
+          </select>
+          <div id="fontGrid" class="font-grid" aria-label="Font choices"></div>
+        </div>
+        <div class="step-nav">
+          <button type="button" class="secondary" data-back>Back</button>
+          <button type="button" class="primary" data-next>Next</button>
+        </div>
+      </section>
+
+      <!-- STEP 4: Top Text -->
+      <section class="form-step" data-step="4" hidden>
+        <div>
+          <label for="nameField" id="nameLabel">Top Text</label>
+          <img src="./titleexample.png" alt="Example of title placement" class="example-image" />
+          <p class="image-caption" id="titleImageCaption">This text appears at the top of your design.</p>
+          <p class="field-hint" id="nameHint">
+            Default:
+            <span class="hint-default">Baby is a...</span>
+            <span class="hint-note">Leave blank to use the default top text.</span>
+          </p>
+          <div class="field-subheading" id="customTitleLabel">Custom Title (optional)</div>
+          <input id="nameField" class="input-strong" type="text" placeholder="Baby Miller is..." aria-labelledby="nameLabel customTitleLabel" aria-describedby="nameHint" />
+        </div>
+        <div class="step-nav">
+          <button type="button" class="secondary" data-back>Back</button>
+          <button type="button" class="primary" data-next>Next</button>
+        </div>
+      </section>
+
+      <!-- STEP 5: Reveal message -->
+      <section class="form-step" data-step="5" hidden>
+        <div>
+          <label for="message" id="messageLabel">Reveal Message (final screen – use | for new lines)</label>
+          <img src="./revealmessageexample.png" alt="Example of reveal message placement" class="example-image" />
+          <p class="image-caption" id="revealImageCaption">This text appears on the final reveal screen.</p>
+          <p class="field-hint" id="messageDefaultHint">
+            Default:
+            <span class="hint-default">It’s a girl!<br>It’s a boy!</span>
+            <span class="hint-note">Leave blank to use the default reveal message.</span>
+          </p>
+          <textarea id="message" aria-describedby="messageHint messageDefaultHint" placeholder="e.g., We can’t wait to meet you!|You’re already so loved."></textarea>
+          <p class="field-hint" id="messageHint">Hint: use | to add a new line in the final reveal overlay.</p>
+        </div>
+        <div class="step-nav">
+          <button type="button" class="secondary" data-back>Back</button>
+          <button type="button" class="primary" data-next>Next</button>
+        </div>
+      </section>
+
+      <!-- STEP 6: Optional image URL -->
+      <section class="form-step" data-step="6" hidden>
+        <div>
+          <h3 class="section-title" id="revealImageTitle">Reveal Image (Optional)</h3>
+
+          <img src="./imageexample.png" alt="Example of reveal image placement" class="example-image" />
+
+          <div class="image-url-row">
+            <label for="imageUrlField" id="imageLabel">Image URL</label>
+            <button type="button" class="help-trigger" id="img-help" aria-expanded="false" aria-controls="tooltip">?</button>
+          </div>
+
+          <input id="imageUrlField" class="input-wide" type="url" inputmode="url" placeholder="https://example.com/reveal.jpg"
+            pattern="https?://.*\.(?:png|jpe?g|gif|webp|svg)" title="Provide a direct link ending in .png, .jpg, .jpeg, .gif, .webp, or .svg" />
+
+          <div id="tooltip" class="image-tooltip" role="region" aria-live="polite" tabindex="-1" hidden>
+            <strong>How to upload an image (URL required):</strong><br>
+            1. Go to <a href="https://imgur.com/upload" target="_blank" rel="noreferrer">imgur.com/upload</a><br>
+            2. Upload your image<br>
+            3. Right-click the image<br>
+            4. Click “Copy Image Address”<br>
+            5. Paste it here<br><br>
+            <strong>🇬🇧If you're in the UK (Imgur blocked – use Postimages):</strong><br>
+            1. Go to <a href="https://postimages.org" target="_blank" rel="noreferrer">postimages.org</a><br>
+            2. Upload your image<br>
+            3. Copy the “Direct link”<br>
+            4. Paste it here
+          </div>
+
+          <p id="imageUrlFeedback" class="field-feedback" hidden></p>
+        </div>
+        <div class="step-nav">
+          <button type="button" class="secondary" data-back>Back</button>
+          <button type="button" class="primary" data-next>Next</button>
+        </div>
+      </section>
+
+      <!-- STEP 7: Generate -->
+      <section class="form-step" data-step="7" hidden>
+        <div class="actions">
+          <button type="button" class="primary" id="generateBtn">Generate URL</button>
+        </div>
+        <div class="output" id="resultContainer" hidden>
+          <div class="result-row">
+            <input type="text" id="shareOutput" readonly aria-live="polite" />
+            <button type="button" class="copy-pill" id="copyPill" hidden aria-label="Copy URL">Copy</button>
+          </div>
+          <div class="output-controls">
+            <button type="button" class="secondary" id="copyButton" aria-disabled="true">Copy to Clipboard</button>
+          </div>
+        </div>
+        <div class="step-nav step-nav--final">
+          <button type="button" class="secondary" data-back>Back</button>
+          <button type="button" class="secondary" id="createAgainBtn">Create Again</button>
+        </div>
+      </section>
+    </form>
+
+    <section id="previewContainer" class="preview-panel" hidden>
+      <div class="preview-header">
+        <h2 class="preview-title" id="previewHeading">Live Preview</h2>
+        <p class="preview-note" id="previewNote">Click through the preview to see changes.</p>
+      </div>
+      <div class="preview-frame-wrapper">
+        <iframe
+          id="previewFrame"
+          class="preview-frame"
+          title="Reveal preview"
+          loading="lazy"
+          referrerpolicy="no-referrer"
+          allow="fullscreen"
+          tabindex="0"
+        ></iframe>
+      </div>
+    </section>
+
+  </main>
+  </div>
+
+  <!-- Language chooser -->
+  <div class="language-overlay" id="languageOverlay" role="dialog" aria-modal="true" aria-labelledby="languageHeading" aria-describedby="languageDescription" hidden>
+    <div class="language-dialog">
+      <h2 id="languageHeading">Select a language</h2>
+      <p id="languageDescription">This sets the language for how you fill out this setup form.<br>(You can choose a different language later for the reveal design and messages.)</p>
+      <form id="languageForm">
+        <fieldset>
+          <legend class="visually-hidden">Available languages</legend>
+          <div class="language-options">
+            <label class="radio-option"><input type="radio" name="language" value="en" checked /><span data-language-name="en">English</span></label>
+            <label class="radio-option"><input type="radio" name="language" value="es" /><span data-language-name="es">Español</span></label>
+            <label class="radio-option"><input type="radio" name="language" value="fr" /><span data-language-name="fr">Français</span></label>
+            <label class="radio-option"><input type="radio" name="language" value="de" /><span data-language-name="de">Deutsch</span></label>
+          </div>
+        </fieldset>
+        <button type="submit" class="primary" id="languageConfirm">Continue</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // --- Simple password gate (client-side; not secure) ---
+    (function(){
+      const PASSWORDS = [
+        'JoyJot-2025',
+        'SnowBell-1207'
+      ];
+      const STORAGE_KEY = 'jjxmas_builder_authed_v1';
+
+      function unlock(){
+        const gate = document.getElementById('gate');
+        const app = document.getElementById('app');
+        if (gate) gate.setAttribute('hidden', '');
+        if (app) app.removeAttribute('hidden');
+        // Hide gate-active class when unlocked
+        document.body.classList.remove('gate-active');
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        // Add gate-active class to body while gate is visible
+        document.body.classList.add('gate-active');
+        // Focus the password box on load to make desktop input obvious
+        setTimeout(() => { try { document.getElementById('gatePw')?.focus(); } catch(_) {} }, 0);
+        try{
+          if (localStorage.getItem(STORAGE_KEY) === '1'){
+            unlock();
+            return;
+          }
+        }catch(_){}
+
+        const form = document.getElementById('gateForm');
+        const input = document.getElementById('gatePw');
+        const err = document.getElementById('gateError');
+        if (!form || !input){ unlock(); return; } // fail-open if missing
+
+        form.addEventListener('submit', (e)=>{
+          e.preventDefault();
+          const val = (input.value || '').trim();
+          if (PASSWORDS.includes(val)){
+            try{ localStorage.setItem(STORAGE_KEY, '1'); }catch(_){ }
+            unlock();
+          } else {
+            err.textContent = 'Incorrect password. Please check your Etsy PDF receipt.';
+            input.focus();
+            input.select();
+          }
+        });
+      });
+    })();
+    // ---------- i18n labels ----------
+    const translations = {
+      en: {
+        title:'Customize Your Reveal Link', gender:'Boy or Girl?', name:'Top Title (Name)', intro:'Intro Message',
+        message:'Reveal Message (final screen – use | for new lines)', messageHint:'Hint: separate lines with the | character.', style:'Font', image:'Image URL (optional)', imageHelp:'Reveal Image URL', generate:'Generate URL', copy:'Copy to Clipboard',
+        makePrivate:'Make Private (Base64)',
+        preview:'Live Preview', changeLanguage:'Change Language', selectLanguageTitle:'Select a language',
+        selectLanguageDescription:'This sets the language for how you fill out this setup form. (You can choose a different language later for the reveal design and message everyone will see.)',
+        confirmLanguage:'Continue', revealLanguageLabel:'Reveal Language',
+        revealLanguageHint:'Choose the language for the reveal design and message everyone will see.',
+        languageNames:{ en:'English', es:'Español', fr:'Français', de:'Deutsch' },
+        previewNote:'Click through the preview to see changes.',
+        steps:['Gender','Language','Intro','Title','Reveal','Image','Link'],
+        boy:'Boy', girl:'Girl', next:'Next', back:'Back',
+        introPlaceholder:"It’s Christmas time.\nOh what joy.\nIs Baby a girl or boy?",
+        namePlaceholder:"e.g., Baby is a...",
+        messagePlaceholder:"e.g., We can’t wait to meet you!|You’re already so loved.",
+        imagePlaceholder:'https://example.com/reveal.jpg',
+        introNote: "Leave blank to use the default intro.<br>Use the <code>|</code> character to make a new line.",
+        nameNote:'Leave blank to use the default top text.',
+        messageNote:'Leave blank to use the default reveal message.',
+        defaultLabel:'Default:',
+        customIntroLabel:'Custom Intro (optional)',
+        customTitleLabel:'Custom Title (optional)',
+        fontHeading:'Choose a Font Style',
+        titleImageCaption:'This text appears at the top of your design.',
+        revealImageCaption:'This text appears on the final reveal screen.',
+        revealImageTitle:'Reveal Image (Optional)',
+        createAgain:'Create Again',
+        nameDefault:'Baby is a...',
+        messageDefault:'It’s a girl!<br>It’s a boy!',
+        imageTooltipHtml: '<strong>How to upload an image (URL required):</strong><br>1. Go to <a href="https://imgur.com/upload" target="_blank" rel="noreferrer">imgur.com/upload</a><br>2. Upload your image<br>3. Right-click the image<br>4. Click “Copy Image Address”<br>5. Paste it here<br><br><strong>🇬🇧If you\\\'re in the UK (Imgur blocked – use Postimages):</strong><br>1. Go to <a href="https://postimages.org" target="_blank" rel="noreferrer">postimages.org</a><br>2. Upload your image<br>3. Copy the “Direct link”<br>4. Paste it here',
+      },
+      es: {
+        title:'Personaliza tu enlace', gender:'¿Niño o niña?', name:'Título superior (Nombre)', intro:'Mensaje de inicio',
+        message:'Mensaje de revelación (pantalla final, usa | para saltos de línea)', messageHint:'Pista: separa líneas con el carácter |.', style:'Fuente', image:'URL de imagen (opcional)', imageHelp:'URL de imagen de la revelación', generate:'Generar enlace', copy:'Copiar',
+        makePrivate:'Hacer privado (Base64)',
+        preview:'Vista previa en vivo', changeLanguage:'Cambiar idioma', selectLanguageTitle:'Selecciona un idioma',
+        selectLanguageDescription:'Esto define el idioma de este formulario de configuración. (Puedes elegir otro idioma después para el diseño y el mensaje de la revelación.)', confirmLanguage:'Continuar',
+        revealLanguageLabel:'Idioma de la revelación',
+        revealLanguageHint:'Elige el idioma del diseño y el mensaje que verán todas las personas.',
+        languageNames:{ en:'English', es:'Español', fr:'Français', de:'Deutsch' },
+        previewNote:'Haz clic en la vista previa para ver los cambios.',
+        steps:['Género','Idioma','Introducción','Título','Revelación','Imagen','Enlace'],
+        boy:'Niño', girl:'Niña', next:'Siguiente', back:'Atrás',
+        introPlaceholder:"Es tiempo de Navidad.|Qué alegría.|¿El bebé es niña o niño?",
+        namePlaceholder:"P. ej., Bebé Miller es un...",
+        messagePlaceholder:"P. ej., ¡No podemos esperar a conocerte!|Ya eres tan amado.",
+        imagePlaceholder:'https://ejemplo.com/revelacion.jpg',
+        introNote: "Déjalo en blanco para usar el mensaje predeterminado. Usa el carácter <code>|</code> para crear una nueva línea.",
+        nameNote:'Déjalo en blanco para usar el texto superior predeterminado.',
+        messageNote:'Déjalo en blanco para usar el mensaje de revelación predeterminado.',
+        defaultLabel:'Predeterminado:',
+        customIntroLabel:'Introducción personalizada (opcional)',
+        customTitleLabel:'Título personalizado (opcional)',
+        fontHeading:'Elige un estilo de fuente',
+        titleImageCaption:'Este texto aparece en la parte superior del diseño.',
+        revealImageCaption:'Este texto aparece en la pantalla final de revelación.',
+        revealImageTitle:'Imagen de revelación (opcional)',
+        createAgain:'Crear de nuevo',
+        nameDefault:'Bebé es...',
+        messageDefault:'¡Es una niña!<br>¡Es un niño!',
+        imageTooltipHtml: '<strong>Cómo subir una imagen (se requiere URL):</strong><br>1. Ve a <a href="https://imgur.com/upload" target="_blank" rel="noreferrer">imgur.com/upload</a><br>2. Sube tu imagen<br>3. Haz clic derecho en la imagen<br>4. Haz clic en “Copiar dirección de la imagen”<br>5. Pégala aquí<br><br><strong>🇬🇧Si estás en el Reino Unido (Imgur bloqueado – usa Postimages):</strong><br>1. Ve a <a href="https://postimages.org" target="_blank" rel="noreferrer">postimages.org</a><br>2. Sube tu imagen<br>3. Copia el “Direct link”<br>4. Pégalo aquí',
+      },
+      fr: {
+        title:'Personnalisez votre lien', gender:'Garçon ou fille ?', name:'Titre (Nom)', intro:'Message d’intro',
+        message:'Message de révélation (final – utiliser | pour les retours à la ligne)', messageHint:'Astuce : séparez les lignes avec le caractère |.', style:'Police', image:'URL de l’image (optionnel)', imageHelp:'URL de l’image de révélation', generate:'Générer le lien', copy:'Copier',
+        makePrivate:'Rendre privé (Base64)',
+        preview:'Aperçu en direct', changeLanguage:'Changer de langue', selectLanguageTitle:'Sélectionnez une langue',
+        selectLanguageDescription:'Définit la langue utilisée pour remplir ce formulaire de configuration. (Vous pourrez choisir plus tard une autre langue pour le design et le message de révélation.)', confirmLanguage:'Continuer',
+        revealLanguageLabel:'Langue de la révélation',
+        revealLanguageHint:'Choisissez la langue du design et du message que tout le monde verra.',
+        languageNames:{ en:'English', es:'Español', fr:'Français', de:'Deutsch' },
+        previewNote:'Cliquez dans l’aperçu pour voir les changements.',
+        steps:['Sexe','Langue','Intro','Titre','Révélation','Image','Lien'],
+        boy:'Garçon', girl:'Fille', next:'Suivant', back:'Retour',
+        introPlaceholder:"C’est Noël.|Quel bonheur.|Bébé est une fille ou un garçon ?",
+        namePlaceholder:"Ex. : Bébé Miller est un...",
+        messagePlaceholder:"Ex. : Nous avons hâte de te rencontrer !|Tu es déjà tellement aimé(e).",
+        imagePlaceholder:'https://exemple.com/reveal.jpg',
+        introNote: "Laissez vide pour utiliser le message par défaut. Utilisez le caractère <code>|</code> pour aller à la ligne.",
+        nameNote:'Laissez vide pour utiliser le texte supérieur par défaut.',
+        messageNote:'Laissez vide pour utiliser le message de révélation par défaut.',
+        defaultLabel:'Par défaut :',
+        customIntroLabel:'Introduction personnalisée (optionnel)',
+        customTitleLabel:'Titre personnalisé (optionnel)',
+        fontHeading:'Choisissez un style de police',
+        titleImageCaption:'Ce texte apparaît en haut de votre design.',
+        revealImageCaption:'Ce texte apparaît sur l’écran final de révélation.',
+        revealImageTitle:'Image de révélation (optionnel)',
+        createAgain:'Créer à nouveau',
+        nameDefault:'Bébé est...',
+        messageDefault:'C’est une fille !<br>C’est un garçon !',
+        imageTooltipHtml: '<strong>Comment envoyer une image (URL requise) :</strong><br>1. Allez sur <a href="https://imgur.com/upload" target="_blank" rel="noreferrer">imgur.com/upload</a><br>2. Téléversez votre image<br>3. Faites un clic droit sur l’image<br>4. Cliquez sur « Copier l’adresse de l’image »<br>5. Collez-la ici<br><br><strong>🇬🇧Si vous êtes au Royaume‑Uni (Imgur bloqué – utilisez Postimages) :</strong><br>1. Allez sur <a href="https://postimages.org" target="_blank" rel="noreferrer">postimages.org</a><br>2. Téléversez votre image<br>3. Copiez le « Direct link »<br>4. Collez-le ici',
+      },
+      de: {
+        title:'Passen Sie Ihren Link an', gender:'Junge oder Mädchen?', name:'Titel (Name)', intro:'Intro-Nachricht',
+        message:'Enthüllungsnachricht (Finale – | für Zeilenumbrüche)', messageHint:'Hinweis: Trenne Zeilen mit dem Zeichen |.', style:'Schriftart', image:'Bild-URL (optional)', imageHelp:'Bild-URL für die Reveal-Seite', generate:'Link erstellen', copy:'Kopieren',
+        makePrivate:'Privat machen (Base64)',
+        preview:'Live-Vorschau', changeLanguage:'Sprache ändern', selectLanguageTitle:'Sprache auswählen',
+        selectLanguageDescription:'Legt die Sprache für dieses Einrichtungsformular fest. (Später kannst du eine andere Sprache für das Reveal-Design und die Nachricht auswählen.)', confirmLanguage:'Weiter',
+        revealLanguageLabel:'Reveal-Sprache',
+        revealLanguageHint:'Wähle die Sprache für das Reveal-Design und die Nachricht, die alle sehen werden.',
+        languageNames:{ en:'English', es:'Español', fr:'Français', de:'Deutsch' },
+        previewNote:'Klicke in der Vorschau, um Änderungen zu sehen.',
+        steps:['Geschlecht','Sprache','Intro','Titel','Enthüllung','Bild','Link'],
+        boy:'Junge', girl:'Mädchen', next:'Weiter', back:'Zurück',
+        introPlaceholder:"Es ist Weihnachtszeit.|Was für eine Freude.|Ist das Baby ein Mädchen oder ein Junge?",
+        namePlaceholder:"Z. B. Baby Miller ist ein...",
+        messagePlaceholder:"Z. B. Wir können es kaum erwarten, dich kennenzulernen!|Du bist jetzt schon so geliebt.",
+        imagePlaceholder:'https://beispiel.de/reveal.jpg',
+        introNote: "Leer lassen, um den Standardtext zu verwenden. Verwende das Zeichen <code>|</code> für einen Zeilenumbruch.",
+        nameNote:'Leer lassen, um den Standardtitel zu verwenden.',
+        messageNote:'Leer lassen, um die Standard-Enthüllungsnachricht zu verwenden.',
+        defaultLabel:'Standard:',
+        customIntroLabel:'Eigene Einleitung (optional)',
+        customTitleLabel:'Eigener Titel (optional)',
+        fontHeading:'Wähle einen Schriftstil',
+        titleImageCaption:'Dieser Text erscheint oben im Design.',
+        revealImageCaption:'Dieser Text erscheint auf dem finalen Reveal-Bildschirm.',
+        revealImageTitle:'Reveal-Bild (optional)',
+        createAgain:'Erneut erstellen',
+        nameDefault:'Baby ist ...',
+        messageDefault:'Es ist ein Mädchen!<br>Es ist ein Junge!',
+        imageTooltipHtml: '<strong>So lädst du ein Bild hoch (URL erforderlich):</strong><br>1. Gehe zu <a href="https://imgur.com/upload" target="_blank" rel="noreferrer">imgur.com/upload</a><br>2. Lade dein Bild hoch<br>3. Klicke mit der rechten Maustaste auf das Bild<br>4. Klicke auf „Bildadresse kopieren“<br>5. Füge sie hier ein<br><br><strong>🇬🇧Wenn du im Vereinigten Königreich bist (Imgur blockiert – nutze Postimages):</strong><br>1. Gehe zu <a href="https://postimages.org" target="_blank" rel="noreferrer">postimages.org</a><br>2. Lade dein Bild hoch<br>3. Kopiere den „Direct link“<br>4. Füge ihn hier ein',
+      },
+    };
+    // Helper to escape HTML for safe display in hints
+    function escapeHtml(str){
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // ---------- DOM refs ----------
+    const params = new URLSearchParams(location.search);
+    const revealLangParam = params.get('lang');
+    const uiLangParam = params.get('ui');
+    const dataParam = params.get('d');
+
+    let payloadParams = null;
+    if (dataParam){
+      try{
+        const decoded = b64DecodeUtf8(dataParam);
+        payloadParams = new URLSearchParams(decoded);
+      }catch(err){
+        console.error('Unable to decode incoming reveal data:', err);
+      }
+    }
+
+    const payloadLang = payloadParams && translations[payloadParams.get('lang')] ? payloadParams.get('lang') : null;
+    let uiLanguage = translations[uiLangParam]
+      ? uiLangParam
+      : (translations[payloadLang]
+        ? payloadLang
+        : (translations[revealLangParam] ? revealLangParam : 'en'));
+    let revealLanguage = translations[revealLangParam]
+      ? revealLangParam
+      : (translations[payloadLang] ? payloadLang : uiLanguage);
+    const shouldPromptForLanguage = !(translations[uiLangParam] || translations[revealLangParam] || translations[payloadLang]);
+    let revealLanguageManuallySet = Boolean(revealLangParam || payloadLang);
+
+    const revealForm = document.getElementById('revealForm');
+    const formTitle = document.getElementById('formTitle');
+    const genderLabel = document.getElementById('genderLabel');
+    const nameLabel = document.getElementById('nameLabel');
+    const introLabel = document.getElementById('introLabel');
+    const messageLabel = document.getElementById('messageLabel');
+    const messageHint = document.getElementById('messageHint');
+    const messageDefaultHint = document.getElementById('messageDefaultHint');
+    const revealLanguageLabel = document.getElementById('revealLanguageLabel');
+    const revealLanguageHint = document.getElementById('revealLanguageHint');
+    const imageLabel = document.getElementById('imageLabel');
+    const styleLabel = document.getElementById('styleLabel');
+    const fontHeading = document.getElementById('fontHeading');
+    const customIntroLabel = document.getElementById('customIntroLabel');
+    const customTitleLabel = document.getElementById('customTitleLabel');
+    const titleImageCaption = document.getElementById('titleImageCaption');
+    const revealImageTitle = document.getElementById('revealImageTitle');
+    const revealImageCaption = document.getElementById('revealImageCaption');
+    const imageHelpTitle = document.querySelector('.image-help-title');
+    const imageHelpTrigger = document.getElementById('img-help');
+    const imageTooltip = document.getElementById('tooltip');
+
+    const nameField = document.getElementById('nameField');
+    const introField = document.getElementById('introField');
+    const introHint = document.getElementById('introHint');
+    const nameHint = document.getElementById('nameHint');
+    const messageField = document.getElementById('message');
+    const revealLanguageSelect = document.getElementById('revealLanguageSelect');
+    const imageUrlField = document.getElementById('imageUrlField');
+    const imageUrlFeedback = document.getElementById('imageUrlFeedback');
+    const styleSelect = document.getElementById('styleSelect');
+    const fontGrid = document.getElementById('fontGrid');
+
+    const generateButton = document.getElementById('generateBtn') || document.getElementById('generateButton');
+    const resultContainer = document.getElementById('resultContainer');
+    const resultUrl = document.getElementById('shareOutput') || document.getElementById('resultUrl');
+    const copyButton = document.getElementById('copyButton');
+    const copyPill = document.getElementById('copyPill');
+    const createAgainButton = document.getElementById('createAgainBtn');
+
+    const previewContainer = document.getElementById('previewContainer');
+    const previewFrame = document.getElementById('previewFrame');
+    const previewHeading = document.getElementById('previewHeading');
+    const previewNote = document.getElementById('previewNote');
+
+    const mainLayout = document.querySelector('main');
+    // Confetti container will be attached inside the result-row at runtime
+    let confettiHost = null;
+
+    const genderOptions = document.querySelectorAll('.gender-option');
+    const boyLabel = document.querySelector('[data-gender-option="boy"]');
+    const girlLabel = document.querySelector('[data-gender-option="girl"]');
+    const nextButtons = document.querySelectorAll('[data-next]');
+    const backButtons = document.querySelectorAll('[data-back]');
+
+    const changeLanguageButton = document.getElementById('changeLanguageButton');
+    const helpFab = document.getElementById('helpFab');
+    const helpTeaser = document.getElementById('helpTeaser');
+    const helpPopover = document.getElementById('helpPopover');
+    const languageOverlay = document.getElementById('languageOverlay');
+    const languageForm = document.getElementById('languageForm');
+    const languageInputs = languageForm.querySelectorAll('input[name="language"]');
+    const languageNameElements = document.querySelectorAll('[data-language-name]');
+    const languageHeading = document.getElementById('languageHeading');
+    const languageDescription = document.getElementById('languageDescription');
+    const languageConfirm = document.getElementById('languageConfirm');
+
+    // ----- wizard state -----
+    let currentStep = 1;
+    const stepSections = Array.from(document.querySelectorAll('.form-step'));
+    const stepPills = Array.from(document.querySelectorAll('[data-step-pill]'));
+    const imageStepNumber = Number(imageUrlField?.closest('.form-step')?.dataset.step || 5);
+
+    function setTooltipVisibility(visible){
+      if (!imageTooltip || !imageHelpTrigger) return;
+      const show = Boolean(visible);
+      imageTooltip.toggleAttribute('hidden', !show);
+      imageHelpTrigger.setAttribute('aria-expanded', String(show));
+    }
+
+    function toggleTooltip(){
+      if (!imageTooltip) return;
+      const shouldShow = imageTooltip.hasAttribute('hidden');
+      setTooltipVisibility(shouldShow);
+      if (shouldShow){
+        imageTooltip.focus?.();
+      }
+    }
+
+    function showStep(n){
+      currentStep = Math.max(1, Math.min(n, stepSections.length));
+      stepSections.forEach(sec => {
+        const isActive = Number(sec.dataset.step) === currentStep;
+        sec.toggleAttribute('hidden', !isActive);
+      });
+      stepPills.forEach(p => {
+        p.classList.toggle('is-active', Number(p.dataset.stepPill) === currentStep);
+      });
+      if (currentStep !== imageStepNumber){
+        setTooltipVisibility(false);
+      }
+      const shouldShowPreview = currentStep >= 2;
+      if (previewContainer){
+        previewContainer.toggleAttribute('hidden', !shouldShowPreview);
+      }
+      if (mainLayout){
+        mainLayout.classList.toggle('is-step-one', currentStep === 1);
+        // Add is-last-step class to main when on last step
+        mainLayout.classList.toggle('is-last-step', currentStep === stepSections.length);
+      }
+      // refresh preview whenever the step changes
+      setCopyAvailability(false);
+      if (shouldShowPreview){
+        updatePreview();
+      } else if (!resultContainer.hidden) {
+        updatePreview({ updateResultInput: true });
+      }
+    }
+
+    function bindStepNav(){
+      document.querySelectorAll('[data-next]').forEach(btn=>{
+        btn.addEventListener('click', ()=> showStep(currentStep+1));
+      });
+      document.querySelectorAll('[data-back]').forEach(btn=>{
+        btn.addEventListener('click', ()=> showStep(currentStep-1));
+      });
+    }
+
+    function bindPillNavigation(){
+      stepPills.forEach((pill, idx) => {
+        // Make list items operable like buttons
+        pill.setAttribute('role', 'button');
+        pill.setAttribute('tabindex', '0');
+
+        const go = () => {
+          // If there’s a pending preview update, flush it so the iframe matches
+          flushScheduledPreview();
+          showStep(idx + 1);
+        };
+
+        pill.addEventListener('click', go);
+        pill.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            go();
+          }
+        });
+      });
+    }
+
+    // ---------- helpers ----------
+    function applyTranslations(){
+      const fallbackLocale = translations.en || {};
+      const t = translations[uiLanguage] || fallbackLocale;
+      document.documentElement.lang = uiLanguage;
+      document.title = t.title || fallbackLocale.title || document.title;
+      formTitle.textContent = t.title || fallbackLocale.title || formTitle.textContent;
+      genderLabel.textContent = t.gender || fallbackLocale.gender || genderLabel.textContent;
+      nameLabel.textContent = t.name || fallbackLocale.name || nameLabel.textContent;
+      introLabel.textContent = t.intro || fallbackLocale.intro || introLabel.textContent;
+      messageLabel.textContent = t.message || fallbackLocale.message || messageLabel.textContent;
+      if (messageHint) messageHint.textContent = t.messageHint || fallbackLocale.messageHint || 'Hint: use | to add a new line in the final reveal overlay.';
+      if (revealLanguageLabel) revealLanguageLabel.textContent = t.revealLanguageLabel || fallbackLocale.revealLanguageLabel || 'Reveal Language';
+      if (revealLanguageHint) revealLanguageHint.textContent = t.revealLanguageHint || fallbackLocale.revealLanguageHint || 'Choose the language for the reveal design and message everyone will see.';
+      imageLabel.textContent = t.image || fallbackLocale.image || imageLabel.textContent;
+      if (imageHelpTitle) {
+        imageHelpTitle.textContent = t.imageHelp || fallbackLocale.imageHelp || t.image || fallbackLocale.image || imageHelpTitle.textContent;
+      }
+      // Update image tooltip HTML if present
+      if (imageTooltip) {
+        const tipHtml = t.imageTooltipHtml || fallbackLocale.imageTooltipHtml || imageTooltip.innerHTML;
+        imageTooltip.innerHTML = tipHtml;
+      }
+      styleLabel.textContent = t.style || fallbackLocale.style || styleLabel.textContent;
+      if (fontHeading) fontHeading.textContent = t.fontHeading || fallbackLocale.fontHeading || fontHeading.textContent;
+      if (customIntroLabel) customIntroLabel.textContent = t.customIntroLabel || fallbackLocale.customIntroLabel || customIntroLabel.textContent;
+      if (customTitleLabel) customTitleLabel.textContent = t.customTitleLabel || fallbackLocale.customTitleLabel || customTitleLabel.textContent;
+      const generateText = t.generate || fallbackLocale.generate || generateButton.textContent;
+      generateButton.textContent = generateText;
+      const copyText = t.copy || fallbackLocale.copy || copyButton.textContent;
+      copyButton.textContent = copyText;
+      copyButton.dataset.originalText = copyText;
+      if (previewHeading) previewHeading.textContent = t.preview || fallbackLocale.preview || previewHeading.textContent;
+      if (previewNote){
+        const noteCopy = t.previewNote || fallbackLocale.previewNote || '';
+        previewNote.textContent = noteCopy;
+        previewNote.toggleAttribute('hidden', !noteCopy);
+      }
+      if (titleImageCaption) titleImageCaption.textContent = t.titleImageCaption || fallbackLocale.titleImageCaption || titleImageCaption.textContent;
+      if (revealImageTitle) revealImageTitle.textContent = t.revealImageTitle || fallbackLocale.revealImageTitle || revealImageTitle.textContent;
+      if (revealImageCaption) revealImageCaption.textContent = t.revealImageCaption || fallbackLocale.revealImageCaption || revealImageCaption.textContent;
+      const langBtnLabel = t.changeLanguage || fallbackLocale.changeLanguage || 'Change form language';
+      changeLanguageButton.setAttribute('aria-label', langBtnLabel);
+      const hiddenSpan = changeLanguageButton.querySelector('.visually-hidden');
+      if (hiddenSpan) hiddenSpan.textContent = langBtnLabel;
+      languageHeading.textContent = t.selectLanguageTitle || fallbackLocale.selectLanguageTitle || languageHeading.textContent;
+      languageDescription.textContent = t.selectLanguageDescription || fallbackLocale.selectLanguageDescription || languageDescription.textContent;
+      languageConfirm.textContent = t.confirmLanguage || fallbackLocale.confirmLanguage || languageConfirm.textContent;
+      const fallbackLanguageNames = fallbackLocale.languageNames || {};
+      const defaultLanguageNames = (translations.en && translations.en.languageNames) || {};
+      languageNameElements.forEach(el => {
+        const code = el.dataset.languageName;
+        el.textContent = (t.languageNames||{})[code] || fallbackLanguageNames[code] || defaultLanguageNames[code] || el.textContent;
+      });
+      // Button labels for gender
+      boyLabel.textContent = t.boy || fallbackLocale.boy || 'Boy';
+      girlLabel.textContent = t.girl || fallbackLocale.girl || 'Girl';
+
+      nextButtons.forEach(btn => {
+        btn.textContent = t.next || fallbackLocale.next || 'Next';
+      });
+      backButtons.forEach(btn => {
+        btn.textContent = t.back || fallbackLocale.back || 'Back';
+      });
+
+      if (createAgainButton) {
+        createAgainButton.textContent = t.createAgain || fallbackLocale.createAgain || createAgainButton.textContent;
+      }
+
+      applyRevealPlaceholders();
+
+      const fallbackSteps = translations.en.steps || [];
+      const stepLabels = t.steps || fallbackSteps;
+      stepPills.forEach((pill, index) => {
+        const label = stepLabels[index] || fallbackSteps[index] || pill.textContent || '';
+        pill.textContent = `${index + 1}. ${label}`;
+      });
+
+      // refresh font options for the active language
+      populateStyleOptions();
+      populateRevealLanguageSelect();
+    }
+
+    function applyRevealPlaceholders(){
+      const fallbackLocale = translations.en || {};
+      const trev = translations[revealLanguage] || fallbackLocale;
+      const uiLocale = translations[uiLanguage] || fallbackLocale;
+      const defaultLabel = uiLocale.defaultLabel || fallbackLocale.defaultLabel || 'Default:';
+
+      if (introField){
+        // No placeholder for the intro field to reduce clutter
+        introField.placeholder = '';
+      }
+      if (introHint){
+        const defaultText = trev.introPlaceholder || fallbackLocale.introPlaceholder || "It’s Christmas time.|Oh what joy.|Is Baby a girl or boy?";
+        const note = uiLocale.introNote || fallbackLocale.introNote || 'Leave blank to use the default intro. Use the &lt;code&gt;|&lt;/code&gt; character to make a new line.';
+        introHint.innerHTML = `
+          ${escapeHtml(defaultLabel)}
+          <span class="hint-default">${escapeHtml(defaultText)}</span>
+          <span class="hint-note">${note}</span>
+        `;
+      }
+      if (nameField){
+        nameField.placeholder = trev.namePlaceholder
+          || fallbackLocale.namePlaceholder
+          || nameField.placeholder
+          || '';
+      }
+      if (nameHint){
+        const defaultName = trev.nameDefault || fallbackLocale.nameDefault || 'Baby is a...';
+        const note = uiLocale.nameNote || fallbackLocale.nameNote || '';
+        nameHint.innerHTML = `
+          ${escapeHtml(defaultLabel)}
+          <span class="hint-default">${escapeHtml(defaultName)}</span>
+          <span class="hint-note">${note}</span>
+        `;
+      }
+      if (messageField){
+        messageField.placeholder = trev.messagePlaceholder
+          || fallbackLocale.messagePlaceholder
+          || messageField.placeholder
+          || '';
+      }
+      if (messageDefaultHint){
+        const defaultMessage = trev.messageDefault || fallbackLocale.messageDefault || 'It’s a girl!<br>It’s a boy!';
+        const note = uiLocale.messageNote || fallbackLocale.messageNote || '';
+        messageDefaultHint.innerHTML = `
+          ${escapeHtml(defaultLabel)}
+          <span class="hint-default">${defaultMessage}</span>
+          <span class="hint-note">${note}</span>
+        `;
+      }
+      if (imageUrlField){
+        imageUrlField.placeholder = trev.imagePlaceholder
+          || fallbackLocale.imagePlaceholder
+          || imageUrlField.placeholder
+          || '';
+      }
+    }
+
+    const FONT_PREVIEW_MAP = {
+      'christmas-wonderland': "'Christmas Wonderland','Christmas',cursive",
+      merry: "'Merry Baby','Christmas',cursive",
+      vintage: "'Vintage Christmas','Christmas',serif",
+      christmas: "'Christmas','Segoe UI',sans-serif",
+    };
+
+    function updateSelectPreviewFont(){
+      const fontStack = FONT_PREVIEW_MAP[styleSelect.value] || '';
+      styleSelect.style.fontFamily = fontStack;
+      styleSelect.style.fontWeight = '400';
+      if (fontGrid){
+        const current = styleSelect.value;
+        fontGrid.querySelectorAll('.font-chip').forEach(el => {
+          el.setAttribute('aria-pressed', String(el.getAttribute('data-value') === current));
+        });
+      }
+    }
+
+    const LANGUAGE_CODES = Object.keys(translations);
+
+    function populateStyleOptions() {
+      const EN_FONT_OPTIONS = [
+        { value: 'christmas-wonderland', label: 'Christmas Wonderland' },
+        { value: 'merry', label: 'Merry Baby' },
+        { value: 'vintage', label: 'Vintage Christmas' },
+        { value: 'christmas', label: 'Christmas (plain)' }
+      ];
+      const NON_EN_FONT_OPTIONS = [
+        { value: 'christmas-wonderland', label: 'Christmas Wonderland' },
+        { value: 'vintage', label: 'Vintage Christmas' }
+      ];
+      const currentOptions = (revealLanguage === 'en') ? EN_FONT_OPTIONS : NON_EN_FONT_OPTIONS;
+
+      const prev = styleSelect.value;
+      // Clear existing options
+      while (styleSelect.firstChild) styleSelect.removeChild(styleSelect.firstChild);
+      // Rebuild options
+      currentOptions.forEach(opt => {
+        const o = document.createElement('option');
+        o.value = opt.value;
+        o.textContent = opt.label;
+        const fontStack = FONT_PREVIEW_MAP[opt.value];
+        if (fontStack){
+          o.style.fontFamily = fontStack;
+        }
+        styleSelect.appendChild(o);
+      });
+      // Keep previous selection if still valid; else default to first
+      const hasPrev = currentOptions.some(o => o.value === prev);
+      styleSelect.value = hasPrev ? prev : currentOptions[0].value;
+      updateSelectPreviewFont();
+      buildFontGrid();
+    }
+
+    function populateRevealLanguageSelect(){
+      if (!revealLanguageSelect) return;
+      while (revealLanguageSelect.firstChild) {
+        revealLanguageSelect.removeChild(revealLanguageSelect.firstChild);
+      }
+
+      const fallbackNames = (translations.en && translations.en.languageNames) || {};
+      const uiNames = (translations[uiLanguage] && translations[uiLanguage].languageNames) || {};
+
+      LANGUAGE_CODES.forEach(code => {
+        if (!translations[code]) return;
+        const opt = document.createElement('option');
+        opt.value = code;
+        opt.textContent = uiNames[code] || fallbackNames[code] || code;
+        revealLanguageSelect.appendChild(opt);
+      });
+
+      if (!LANGUAGE_CODES.includes(revealLanguage)){
+        revealLanguage = LANGUAGE_CODES[0] || 'en';
+      }
+      revealLanguageSelect.value = revealLanguage;
+    }
+
+    function buildFontGrid(){
+      if (!fontGrid) return;
+      // Clear the grid
+      while (fontGrid.firstChild) fontGrid.removeChild(fontGrid.firstChild);
+
+      const options = Array.from(styleSelect.querySelectorAll('option'));
+      const currentValue = styleSelect.value;
+
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'font-chip';
+        btn.setAttribute('data-value', opt.value);
+        btn.setAttribute('aria-pressed', String(opt.value === currentValue));
+
+        const span = document.createElement('span');
+        span.className = 'font-name';
+        span.textContent = opt.textContent;
+
+        const fontStack = FONT_PREVIEW_MAP[opt.value] || '';
+        if (fontStack){
+          span.style.fontFamily = fontStack;
+          span.style.fontWeight = '400';
+        }
+        btn.appendChild(span);
+
+        const check = document.createElement('span');
+        check.className = 'check';
+        check.setAttribute('aria-hidden','true');
+        check.textContent = '✓';
+        btn.appendChild(check);
+
+        btn.addEventListener('click', ()=>{
+          // update select value
+          styleSelect.value = opt.value;
+          updateSelectPreviewFont();
+          // update pressed states
+          fontGrid.querySelectorAll('.font-chip').forEach(el => el.setAttribute('aria-pressed', 'false'));
+          btn.setAttribute('aria-pressed', 'true');
+          setCopyAvailability(false);
+          updatePreview();
+        });
+
+        fontGrid.appendChild(btn);
+      });
+    }
+
+    function setCopyAvailability(isEnabled){
+      copyButton.disabled = !isEnabled;
+      copyButton.setAttribute('aria-disabled', String(!isEnabled));
+      resultContainer.hidden = !isEnabled;
+
+      if (copyPill){
+        copyPill.hidden = !isEnabled;
+      }
+
+      if (!isEnabled){
+        const locale = translations[uiLanguage] || translations.en || {};
+        const orig = copyButton.dataset.originalText || locale.copy || 'Copy to Clipboard';
+        copyButton.textContent = orig;
+        resultUrl.value = '';
+      }
+
+      // Prepare a fresh confetti host when the result becomes visible
+      if (isEnabled){
+        const row = resultContainer.querySelector('.result-row');
+        if (row){
+          if (confettiHost) confettiHost.remove();
+          confettiHost = document.createElement('div');
+          confettiHost.className = 'confetti-container';
+          row.style.position = 'relative';
+          row.appendChild(confettiHost);
+        }
+      }
+    }
+
+    function applyPayloadToForm(payload){
+      if (!payload) return;
+
+      const genderValue = payload.get('f') === '1' ? '1' : '0';
+      const genderInput = document.querySelector(`input[name="gender"][value="${genderValue}"]`);
+      if (genderInput){
+        genderInput.checked = true;
+        setActiveRadio(genderInput.closest('.gender-option'));
+      }
+
+      if (payload.has('name') && nameField){
+        nameField.value = payload.get('name');
+      }
+
+      const introValue = payload.get('intro') || payload.get('lo') || payload.get('loMsg');
+      if (introValue && introField){
+        introField.value = introValue
+          .replace(/\r?\n/g, '\n')
+          .replace(/\|/g, '\n');
+      }
+
+      const revealValue = payload.get('revealMsg') || payload.get('msg');
+      if (revealValue && messageField){
+        messageField.value = revealValue
+          .replace(/\r?\n/g, '\n')
+          .replace(/\|/g, '\n');
+      }
+
+      const imageValue = payload.get('img');
+      if (imageValue && imageUrlField){
+        imageUrlField.value = imageValue;
+      }
+
+      const preferredStyle = payload.get('style') || payload.get('msgStyle') || payload.get('loStyle');
+      if (preferredStyle && styleSelect){
+        const hasOption = Array.from(styleSelect.options).some(opt => opt.value === preferredStyle);
+        if (hasOption){
+          styleSelect.value = preferredStyle;
+        }
+      }
+    }
+
+    function b64EncodeUtf8(str){
+      return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode('0x' + p1)));
+    }
+
+    function b64DecodeUtf8(b64){
+      return decodeURIComponent(
+        atob(b64)
+          .split('')
+          .map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0'))
+          .join('')
+      );
+    }
+
+    // Keep shared links clean: only include supported payload params
+    function normalizeShareUrl(href){
+      if (!href) return '';
+      try{
+        const incoming = new URL(href, location.origin);
+        // If there's no Base64 payload (`d`), keep the full readable URL intact.
+        if (!incoming.searchParams.has('d')) {
+          return incoming.toString();
+        }
+        // For Base64 links, rebuild to a clean canonical form containing only d (and optional preview)
+        const out = new URL(BASE_URL);
+        const d = incoming.searchParams.get('d');
+        if (d) out.searchParams.set('d', d);
+        const preview = incoming.searchParams.get('preview');
+        if (preview === '1') out.searchParams.set('preview', '1');
+        return out.toString();
+      }catch(e){
+        // If anything goes wrong, fall back to the original
+        return href;
+      }
+    }
+
+    // --- Keep FABs from covering content on mobile: hide on scroll/down & while typing ---
+    (function(){
+      const fabGroup = document.querySelector('.fab-group');
+      if(!fabGroup) return;
+
+      // Hide while an input/select/textarea is focused (mobile keyboards)
+      const hide = ()=> fabGroup.classList.add('is-hidden');
+      const show = ()=> fabGroup.classList.remove('is-hidden');
+
+      document.addEventListener('focusin', (e)=>{
+        if (e.target.closest('input, textarea, select, [contenteditable="true"]')) hide();
+      });
+      document.addEventListener('focusout', ()=>{
+        // small delay so clicking buttons doesn't flash
+        setTimeout(show, 180);
+      });
+
+      // Hide on scroll down, show on scroll up – mobile only
+      let lastY = window.scrollY;
+      window.addEventListener('scroll', ()=>{
+        if (window.innerWidth > 640) return;
+        const y = window.scrollY;
+        if (y > lastY + 6) { hide(); }       // scrolling down
+        else if (y < lastY - 6) { show(); }  // scrolling up
+        lastY = y;
+      }, {passive:true});
+
+      // Ensure visible when help popover is opened
+      const helpFab = document.getElementById('helpFab');
+      if (helpFab){
+        helpFab.addEventListener('click', show, {capture:true});
+      }
+    })();
+
+    // ---------- form parameter helpers ----------
+    function buildParamsFromForm() {
+      // Read current form state from the actual field IDs used in the markup
+      const f = document.querySelector('input[name="gender"]:checked')?.value || '0';
+      const name = (typeof nameField !== 'undefined' && nameField) ? (nameField.value || '').trim() : '';
+      const loMsg = (typeof introField !== 'undefined' && introField) ? (introField.value || '').trim().replace(/\r?\n/g, '|') : '';
+      const revealMsg = (typeof messageField !== 'undefined' && messageField) ? (messageField.value || '').trim().replace(/\r?\n/g, '|') : '';
+      const style = (typeof styleSelect !== 'undefined' && styleSelect) ? (styleSelect.value || 'christmas-wonderland') : 'christmas-wonderland';
+      const img = (typeof imageUrlField !== 'undefined' && imageUrlField) ? (imageUrlField.value || '').trim() : '';
+
+      const params = new URLSearchParams();
+      // language the reveal page should use
+      params.set('lang', revealLanguage || 'en');
+      // gender (boy=1, girl=0)
+      params.set('f', f);
+
+      // Optional fields
+      if (name) params.set('name', name);
+      if (loMsg) params.set('loMsg', loMsg);
+      if (revealMsg) params.set('revealMsg', revealMsg);
+
+      // Font/style – apply to both message and landing overlay, plus base style
+      params.set('style', style);
+      params.set('msgStyle', style);
+      params.set('loStyle', style);
+
+      // Always render with the overlay flow
+      params.set('overlay', '1');
+
+      // Optional image (validated roughly)
+      if (img && isLikelyImageUrl(img)) {
+        params.set('img', img);
+      }
+
+      return params;
+    }
+
+    // ---------- URL builders (Base64 encoded payload, overlay=1) ----------
+    const BASE_URL = 'https://xmas.joyjotstudio.org/';
+
+    function isLikelyImageUrl(url){
+      if (!url) return false;
+      try {
+        const parsed = new URL(url);
+        const allowedProtocols = ['http:', 'https:'];
+        if (!allowedProtocols.includes(parsed.protocol)) return false;
+        return /\.(png|jpe?g|gif|webp|svg)$/i.test(parsed.pathname);
+      } catch (err) {
+        return false;
+      }
+    }
+
+    function setImageUrlFeedback(message, status = 'neutral'){
+      if (!imageUrlFeedback) return;
+      imageUrlFeedback.textContent = message;
+      imageUrlFeedback.hidden = !message;
+      imageUrlFeedback.classList.remove('is-error', 'is-success');
+      if (status === 'error') imageUrlFeedback.classList.add('is-error');
+      if (status === 'success') imageUrlFeedback.classList.add('is-success');
+    }
+
+    let imageValidationTimer = null;
+    let imageValidationGeneration = 0;
+
+    function scheduleImageValidation(){
+      const generation = ++imageValidationGeneration;
+      if (imageValidationTimer){
+        clearTimeout(imageValidationTimer);
+      }
+      imageValidationTimer = setTimeout(()=>{
+        imageValidationTimer = null;
+        validateImageUrl(generation);
+      }, 500);
+    }
+
+    function validateImageUrl(generation){
+      if (typeof generation !== 'number'){
+        generation = ++imageValidationGeneration;
+      } else {
+        imageValidationGeneration = generation;
+      }
+
+      const url = (imageUrlField.value || '').trim();
+
+      if (!url){
+        imageUrlField.setCustomValidity('');
+        setImageUrlFeedback('', 'neutral');
+        return;
+      }
+
+      if (!isLikelyImageUrl(url)){
+        const msg = 'Please enter a direct link ending in .png, .jpg, .jpeg, .gif, .webp, or .svg';
+        imageUrlField.setCustomValidity(msg);
+        setImageUrlFeedback(msg, 'error');
+        return;
+      }
+
+      imageUrlField.setCustomValidity('');
+      setImageUrlFeedback('Checking image link…');
+
+      const probe = new Image();
+      probe.onload = () => {
+        if (generation !== imageValidationGeneration) return;
+        setImageUrlFeedback('Image link looks good!', 'success');
+        imageUrlField.setCustomValidity('');
+        updatePreview();
+      };
+      probe.onerror = () => {
+        if (generation !== imageValidationGeneration) return;
+        const msg = 'We couldn’t load an image from that link. Right-click the image and copy its direct address.';
+        imageUrlField.setCustomValidity(msg);
+        setImageUrlFeedback(msg, 'error');
+      };
+      probe.src = url;
+    }
+
+    // Build URLs for sharing and previewing
+    function buildResultUrl(){
+      const params = buildParamsFromForm();
+      const encoded = b64EncodeUtf8(params.toString());
+      const url = new URL(BASE_URL);
+      url.searchParams.set('d', encoded);
+      return url.toString();
+    }
+
+    function buildShareUrl(){
+      // Produce a plain, readable URL (no Base64) for the generated link
+      const params = buildParamsFromForm();
+      const url = new URL(BASE_URL);
+      params.forEach((value, key) => {
+        url.searchParams.set(key, value);
+      });
+      return url.toString();
+    }
+
+    function convertRawToBase64Link(rawHref){
+      try {
+        const incoming = new URL(rawHref, location.origin);
+        // Build a URLSearchParams from the current readable query
+        const readable = new URLSearchParams(incoming.search);
+        // Remove preview flag if present
+        readable.delete('preview');
+        readable.delete('_');
+        // Encode to Base64 payload
+        const encoded = b64EncodeUtf8(readable.toString());
+        // Build the final private URL using BASE_URL
+        const out = new URL(BASE_URL);
+        out.searchParams.set('d', encoded);
+        out.searchParams.set('_', String(Date.now())); // optional cache-buster for downstream
+        return out.toString();
+      } catch (e) {
+        console.error('Failed to convert raw link to Base64:', e);
+        return '';
+      }
+    }
+
+function buildPreviewUrl(){
+  // Build a plain querystring for the live preview (NOT Base64),
+  // because the scratcher reads direct params during preview.
+  const params = buildParamsFromForm();
+  const url = new URL(BASE_URL);
+
+  // Write each param directly for the preview page to consume.
+  params.forEach((value, key) => {
+    url.searchParams.set(key, value);
+  });
+
+  // Signal preview mode to the scratcher and cache-bust so the iframe reloads.
+  url.searchParams.set('hidePopup', '1');
+  url.searchParams.set('_', String(Date.now()));
+
+  return url.toString();
+}
+
+    // Debounce the live preview so it refreshes only after typing pauses.
+    const PREVIEW_UPDATE_DELAY = 1000;
+    let previewUpdateTimer = null;
+
+    function updatePreview({updateResultInput=false}={}){
+      const previewUrl = buildPreviewUrl();
+      if (previewFrame && previewContainer && !previewContainer.hidden){
+        if (previewFrame.dataset.currentUrl !== previewUrl){
+          previewFrame.src = previewUrl;
+          previewFrame.dataset.currentUrl = previewUrl;
+        }
+      }
+      if (updateResultInput && resultUrl.value){
+        const cleanUrl = normalizeShareUrl(resultUrl.value);
+        resultUrl.value = cleanUrl;
+      }
+    }
+
+    function schedulePreviewRefresh(){
+      setCopyAvailability(false);
+      if (previewUpdateTimer){
+        clearTimeout(previewUpdateTimer);
+      }
+      previewUpdateTimer = setTimeout(()=>{
+        previewUpdateTimer = null;
+        updatePreview();
+      }, PREVIEW_UPDATE_DELAY);
+    }
+
+    function flushScheduledPreview(){
+      if (!previewUpdateTimer) return;
+      clearTimeout(previewUpdateTimer);
+      previewUpdateTimer = null;
+      updatePreview();
+    }
+
+    function setActiveRadio(targetLabel){
+      document.querySelectorAll('.gender-option').forEach(opt => opt.classList.toggle('active', opt===targetLabel));
+    }
+
+    function openLanguageOverlay(){
+      languageInputs.forEach(input => {
+        input.checked = input.value === uiLanguage;
+        input.closest('.radio-option')?.classList.toggle('active', input.checked);
+      });
+      languageOverlay.hidden = false;
+      (languageForm.querySelector('input[name="language"]:checked') || languageInputs[0] || languageConfirm)?.focus();
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLanguageOverlay(){
+      if (languageOverlay.hidden) return;
+      languageOverlay.hidden = true;
+      document.body.style.overflow = '';
+      changeLanguageButton.focus();
+    }
+
+    // ---- Help teaser + popover logic ----
+    function showHelpTeaserOnce(){
+      if (!helpTeaser) return;
+      const KEY = 'jj_help_teaser_shown';
+      try{
+        if (localStorage.getItem(KEY)) return;
+        helpTeaser.hidden = false;
+        // Auto-hide after the animation completes (4s)
+        setTimeout(() => {
+          helpTeaser.hidden = true;
+          localStorage.setItem(KEY, '1');
+        }, 4000);
+      }catch(e){
+        // Fallback without localStorage
+        helpTeaser.hidden = false;
+        setTimeout(() => { helpTeaser.hidden = true; }, 4000);
+      }
+    }
+
+    function toggleHelpPopover(force){
+      if (!helpPopover || !helpFab) return;
+      const willShow = (typeof force === 'boolean') ? force : helpPopover.hasAttribute('hidden');
+      helpPopover.toggleAttribute('hidden', !willShow);
+      helpFab.setAttribute('aria-expanded', String(willShow));
+      if (willShow){
+        // Move focus to title for accessibility
+        const title = helpPopover.querySelector('#helpPopoverTitle');
+        title && title.focus && title.focus();
+      }
+    }
+    languageOverlay.addEventListener('click', e => { if (e.target === languageOverlay) closeLanguageOverlay(); });
+    languageOverlay.addEventListener('keydown', e => {
+      if (e.key !== 'Tab') return;
+      const focusables = Array.from(languageOverlay.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')).filter(el=>!el.disabled);
+      if (!focusables.length) return;
+      const first = focusables[0], last = focusables[focusables.length-1];
+      if (e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+    });
+    document.addEventListener('focusin', e => {
+      if (languageOverlay.hidden) return;
+      if (!languageOverlay.contains(e.target)){
+        (languageForm.querySelector('input[name="language"]:checked') || languageInputs[0] || languageConfirm)?.focus();
+      }
+    });
+
+    if (imageHelpTrigger){
+      imageHelpTrigger.addEventListener('click', toggleTooltip);
+    }
+    document.addEventListener('click', e => {
+      if (!imageTooltip || imageTooltip.hasAttribute('hidden')) return;
+      if (e.target === imageHelpTrigger || imageHelpTrigger?.contains(e.target)) return;
+      if (imageTooltip.contains(e.target)) return;
+      setTooltipVisibility(false);
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape'){ setTooltipVisibility(false); }
+    });
+
+    // Help FAB events
+    if (helpFab){
+      helpFab.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleHelpPopover();
+      });
+      helpFab.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' '){
+          e.preventDefault();
+          toggleHelpPopover();
+        }
+      });
+    }
+
+    // Close popover on outside click / Escape
+    document.addEventListener('click', (e) => {
+      if (!helpPopover || helpPopover.hasAttribute('hidden')) return;
+      if (e.target === helpFab || helpFab.contains(e.target) || helpPopover.contains(e.target)) return;
+      toggleHelpPopover(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && helpPopover && !helpPopover.hasAttribute('hidden')){
+        toggleHelpPopover(false);
+        helpFab.focus();
+      }
+    });
+
+    // Show the teaser once on first load
+    showHelpTeaserOnce();
+
+    // ---------- events ----------
+    if (revealForm){
+      revealForm.addEventListener('input', schedulePreviewRefresh);
+      revealForm.addEventListener('change', schedulePreviewRefresh);
+    }
+
+    document.querySelectorAll('.gender-option input[type="radio"]').forEach(input=>{
+      input.addEventListener('change', ()=>{
+        if (input.checked){
+          setActiveRadio(input.closest('.gender-option'));
+          setCopyAvailability(false);
+          updatePreview();
+        }
+      });
+    });
+
+    nameField.addEventListener('input', schedulePreviewRefresh);
+    nameField.addEventListener('change', flushScheduledPreview);
+    nameField.addEventListener('blur', flushScheduledPreview);
+
+    introField.addEventListener('input', schedulePreviewRefresh);
+    introField.addEventListener('change', flushScheduledPreview);
+    introField.addEventListener('blur', flushScheduledPreview);
+
+    messageField.addEventListener('input', schedulePreviewRefresh);
+    messageField.addEventListener('change', flushScheduledPreview);
+    messageField.addEventListener('blur', flushScheduledPreview);
+    imageUrlField.addEventListener('input', ()=>{
+      const value = (imageUrlField.value || '').trim();
+      if (!value){
+        if (imageValidationTimer){ clearTimeout(imageValidationTimer); imageValidationTimer = null; }
+        imageValidationGeneration++;
+        imageUrlField.setCustomValidity('');
+        setImageUrlFeedback('', 'neutral');
+        schedulePreviewRefresh();
+      } else if (!isLikelyImageUrl(value)){
+        if (imageValidationTimer){ clearTimeout(imageValidationTimer); imageValidationTimer = null; }
+        imageValidationGeneration++;
+        const msg = 'Please enter a direct link ending in .png, .jpg, .jpeg, .gif, .webp, or .svg';
+        imageUrlField.setCustomValidity(msg);
+        setImageUrlFeedback(msg, 'error');
+        schedulePreviewRefresh();
+      } else {
+        imageUrlField.setCustomValidity('');
+        setImageUrlFeedback('Checking image link…');
+        setCopyAvailability(false);
+        scheduleImageValidation();
+      }
+    });
+    imageUrlField.addEventListener('change', ()=>{
+      if (imageValidationTimer){ clearTimeout(imageValidationTimer); imageValidationTimer = null; }
+      flushScheduledPreview();
+      validateImageUrl();
+    });
+    imageUrlField.addEventListener('blur', ()=>{
+      if (imageValidationTimer){ clearTimeout(imageValidationTimer); imageValidationTimer = null; }
+      flushScheduledPreview();
+      validateImageUrl();
+    });
+    styleSelect.addEventListener('change', ()=>{
+      updateSelectPreviewFont();
+      setCopyAvailability(false);
+      updatePreview();
+    });
+
+    if (revealLanguageSelect){
+      revealLanguageSelect.addEventListener('change', ()=>{
+        const next = revealLanguageSelect.value;
+        if (!translations[next]) return;
+        revealLanguage = next;
+        revealLanguageManuallySet = true;
+        applyRevealPlaceholders();
+        populateStyleOptions();
+        setCopyAvailability(false);
+        updatePreview();
+        const qs = new URLSearchParams(location.search);
+        qs.set('lang', revealLanguage);
+        if (uiLanguage){
+          qs.set('ui', uiLanguage);
+        }
+        history.replaceState({}, '', `${location.pathname}?${qs.toString()}`);
+      });
+    }
+
+    changeLanguageButton.addEventListener('click', openLanguageOverlay);
+
+    languageForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const sel = languageForm.querySelector('input[name="language"]:checked');
+      if (!sel) return;
+      if (!translations[sel.value]) return;
+      const shouldSyncReveal = !revealLanguageManuallySet;
+      uiLanguage = sel.value;
+      if (shouldSyncReveal){
+        revealLanguage = uiLanguage;
+      }
+      applyTranslations();
+      applyRevealPlaceholders();
+      setCopyAvailability(false);
+      updatePreview();
+      closeLanguageOverlay();
+      // reflect in the generator page URL
+      const qs = new URLSearchParams(location.search);
+      qs.set('ui', uiLanguage);
+      qs.set('lang', revealLanguage);
+      history.replaceState({}, '', `${location.pathname}?${qs.toString()}`);
+    });
+
+    function shootConfetti(anchorEl){
+      if (!confettiHost || !anchorEl) return;
+      const rect = anchorEl.getBoundingClientRect();
+      const hostRect = confettiHost.getBoundingClientRect();
+      const originX = rect.left + rect.width * 0.75 - hostRect.left;
+      const originY = rect.top + rect.height * 0.2 - hostRect.top;
+
+      const variants = ['', 'alt1', 'alt2', 'alt3'];
+      const pieces = 18;
+      for (let i = 0; i < pieces; i++){
+        const span = document.createElement('span');
+        span.className = `confetti-piece ${variants[i % variants.length]}`;
+
+        const angle = (Math.random() * Math.PI) - (Math.PI / 2);
+        const distance = 60 + Math.random() * 60;
+        const dx = Math.cos(angle) * distance;
+        const dy = Math.sin(angle) * distance + 60;
+        const rot = (Math.random() * 360 - 180).toFixed(1) + 'deg';
+
+        span.style.setProperty('--x', `${(rect.width * 0.25) + dx}px`);
+        span.style.setProperty('--y', `${originY + dy}px`);
+        span.style.setProperty('--r', rot);
+
+        confettiHost.appendChild(span);
+        span.addEventListener('animationend', () => span.remove());
+      }
+    }
+
+    generateButton.addEventListener('click', async ()=>{
+      // make sure preview reflects current fields
+      flushScheduledPreview();
+
+      // Basic loading state
+      const originalText = generateButton.textContent;
+      generateButton.textContent = (translations[uiLanguage]?.generate || 'Generate URL') + '…';
+      generateButton.disabled = true;
+
+      try {
+        // Build the Base-64 (private) link directly
+        const link = buildResultUrl();
+        if (!link) {
+          throw new Error('Unable to build link');
+        }
+        const shareField = document.querySelector('#shareOutput') || resultUrl;
+
+        // Normalize to the canonical d= form (keeps only ?d= and optional preview/_)
+        const shareUrl = normalizeShareUrl(link);
+
+        setCopyAvailability(true);
+
+        if (shareField){
+          shareField.value = shareUrl;
+          shareField.focus();
+          shareField.select();
+        }
+      } catch (err) {
+        console.error('Link generation failed:', err);
+        alert(`Error creating link: ${err.message}`);
+        setCopyAvailability(false);
+      } finally {
+        generateButton.textContent = originalText;
+        generateButton.disabled = false;
+      }
+    });
+
+    copyButton.addEventListener('click', async ()=>{
+      try{
+        const cleaned = normalizeShareUrl(resultUrl.value);
+        if (!cleaned){
+          throw new Error('No link to copy');
+        }
+        resultUrl.value = cleaned;
+        const originalText = copyButton.dataset.originalText || copyButton.textContent;
+        await navigator.clipboard.writeText(resultUrl.value);
+        copyButton.dataset.originalText = originalText;
+        copyButton.textContent = `${originalText} ✓`;
+        if (copyPill){ shootConfetti(copyPill); }
+        setTimeout(()=>{ copyButton.textContent = copyButton.dataset.originalText; }, 1400);
+      }catch(err){ console.error('Clipboard copy failed', err); }
+    });
+
+
+    if (copyPill){
+      copyPill.addEventListener('click', async ()=>{
+        try{
+          const cleaned = normalizeShareUrl(resultUrl.value);
+          if (!cleaned){
+            throw new Error('No link to copy');
+          }
+          resultUrl.value = cleaned;
+          await navigator.clipboard.writeText(resultUrl.value);
+          const original = copyPill.textContent;
+          copyPill.textContent = 'Copied!';
+          shootConfetti(copyPill);
+          setTimeout(()=>{ copyPill.textContent = original; }, 1000);
+        }catch(err){
+          console.error('Clipboard copy (pill) failed', err);
+        }
+      });
+    }
+
+    window.addEventListener('keydown', (e)=>{ if (e.key==='Escape' && !languageOverlay.hidden){ e.preventDefault(); closeLanguageOverlay(); } });
+
+    // ---------- init ----------
+    applyTranslations();
+    applyPayloadToForm(payloadParams);
+    updateSelectPreviewFont();
+    setCopyAvailability(false);
+    updatePreview();
+    bindStepNav();
+    bindPillNavigation();
+    showStep(1);
+    if (shouldPromptForLanguage) openLanguageOverlay();
+    if ((imageUrlField.value || '').trim()){
+      validateImageUrl();
+    }
+  </script>
+  <script>
+    // --- Create Again Button logic ---
+    const createAgainBtn = document.getElementById('createAgainBtn');
+    if (createAgainBtn) {
+      createAgainBtn.addEventListener('click', () => {
+        showStep(1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+  </script>
+</body>
+</html>
