@@ -1337,7 +1337,7 @@
     }
 
     function bindPillNavigation(){
-      stepPills.forEach((pill, idx) => {
+      stepPills.forEach((pill) => {
         // Make list items operable like buttons
         pill.setAttribute('role', 'button');
         pill.setAttribute('tabindex', '0');
@@ -1345,7 +1345,8 @@
         const go = () => {
           // If there’s a pending preview update, flush it so the iframe matches
           flushScheduledPreview();
-          showStep(idx + 1);
+          const stepNumber = Number(pill.dataset.stepPill);
+          showStep(stepNumber);
         };
 
         pill.addEventListener('click', go);
