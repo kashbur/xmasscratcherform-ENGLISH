@@ -272,6 +272,11 @@
       line-height: 1;
     }
 
+    /* Hide language FAB for English-only version */
+    .language-fab {
+      display: none !important;
+    }
+
     .language-fab:hover,
     .help-fab:hover,
     .language-fab:focus-visible,
@@ -729,12 +734,12 @@
     <nav class="steps" aria-label="Progress">
       <ol class="steps-list">
         <li class="step-pill" data-step-pill="1">1. Gender</li>
-        <li class="step-pill" data-step-pill="2">2. Language</li>
-        <li class="step-pill" data-step-pill="3">3. Intro</li>
-        <li class="step-pill" data-step-pill="4">4. Title</li>
-        <li class="step-pill" data-step-pill="5">5. Reveal</li>
-        <li class="step-pill" data-step-pill="6">6. Image</li>
-        <li class="step-pill" data-step-pill="7">7. Link</li>
+        <!-- Step 2 (Language) hidden for English-only version -->
+        <li class="step-pill" data-step-pill="3">2. Intro</li>
+        <li class="step-pill" data-step-pill="4">3. Title</li>
+        <li class="step-pill" data-step-pill="5">4. Reveal</li>
+        <li class="step-pill" data-step-pill="6">5. Image</li>
+        <li class="step-pill" data-step-pill="7">6. Link</li>
       </ol>
     </nav>
 
@@ -791,8 +796,8 @@
         </div>
       </section>
 
-      <!-- STEP 2: Reveal language -->
-      <section class="form-step" data-step="2" hidden>
+      <!-- STEP 2: Reveal language - HIDDEN for English-only version -->
+      <section class="form-step" data-step="2" hidden style="display: none !important;">
         <div id="ui-controls" role="group" aria-label="Reveal language controls">
           <p class="ui-instruction" id="revealLanguageHint" style="font-size:1.3rem;font-weight:800;text-align:center;margin-bottom:8px;">Choose the language for the reveal design and message everyone will see.</p>
           <div class="ui-row" style="flex-direction:column;align-items:center;gap:6px;">
@@ -965,8 +970,8 @@
   </main>
   </div>
 
-  <!-- Language chooser -->
-  <div class="language-overlay" id="languageOverlay" role="dialog" aria-modal="true" aria-labelledby="languageHeading" aria-describedby="languageDescription" hidden>
+  <!-- Language chooser - HIDDEN for English-only version -->
+  <div class="language-overlay" id="languageOverlay" role="dialog" aria-modal="true" aria-labelledby="languageHeading" aria-describedby="languageDescription" hidden style="display: none !important;">
     <div class="language-dialog">
       <h2 id="languageHeading">Select a language</h2>
       <p id="languageDescription">This sets the language for how you fill out this setup form.<br>(You can choose a different language later for the reveal design and messages.)</p>
@@ -1289,6 +1294,10 @@
     }
 
     function showStep(n){
+      // Skip step 2 (language selection) for English-only version
+      if (n === 2) {
+        n = currentStep < 2 ? 3 : 1; // Skip to step 3 if going forward, step 1 if going back
+      }
       currentStep = Math.max(1, Math.min(n, stepSections.length));
       stepSections.forEach(sec => {
         const isActive = Number(sec.dataset.step) === currentStep;
@@ -1422,8 +1431,17 @@
 
       const fallbackSteps = translations.en.steps || [];
       const stepLabels = t.steps || fallbackSteps;
+      // English-only version: skip step 2 (Language) in the display
+      const adjustedLabels = [
+        stepLabels[0], // Gender
+        stepLabels[2], // Intro
+        stepLabels[3], // Title
+        stepLabels[4], // Reveal
+        stepLabels[5], // Image
+        stepLabels[6]  // Link
+      ];
       stepPills.forEach((pill, index) => {
-        const label = stepLabels[index] || fallbackSteps[index] || pill.textContent || '';
+        const label = adjustedLabels[index] || fallbackSteps[index] || pill.textContent || '';
         pill.textContent = `${index + 1}. ${label}`;
       });
 
@@ -2157,7 +2175,10 @@ function buildPreviewUrl(){
       });
     }
 
-    changeLanguageButton.addEventListener('click', openLanguageOverlay);
+    changeLanguageButton.addEventListener('click', ()=>{
+      // Language selection disabled for English-only version
+      // openLanguageOverlay();
+    });
 
     languageForm.addEventListener('submit', (e)=>{
       e.preventDefault();
@@ -2293,7 +2314,8 @@ function buildPreviewUrl(){
     bindStepNav();
     bindPillNavigation();
     showStep(1);
-    if (shouldPromptForLanguage) openLanguageOverlay();
+    // Language prompt disabled for English-only version
+    // if (shouldPromptForLanguage) openLanguageOverlay();
     if ((imageUrlField.value || '').trim()){
       validateImageUrl();
     }
